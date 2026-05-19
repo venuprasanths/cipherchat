@@ -37,9 +37,7 @@
             box-shadow: 2px 0 10px rgba(0,0,0,0.5);
         }
         
-        .sidebar.open {
-            left: 0;
-        }
+        .sidebar.open { left: 0; }
         
         .overlay {
             position: fixed;
@@ -52,9 +50,7 @@
             display: none;
         }
         
-        .overlay.active {
-            display: block;
-        }
+        .overlay.active { display: block; }
         
         .sidebar-header {
             padding: 20px;
@@ -99,19 +95,9 @@
             font-size: 24px;
         }
         
-        .user-details {
-            flex: 1;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .user-privacy {
-            font-size: 12px;
-            color: #8696a0;
-        }
+        .user-details { flex: 1; }
+        .user-name { font-weight: 600; font-size: 16px; }
+        .user-privacy { font-size: 12px; color: #8696a0; }
         
         .tabs {
             display: flex;
@@ -132,10 +118,7 @@
             font-weight: 500;
         }
         
-        .tab.active {
-            color: #00e5b0;
-            border-bottom: 2px solid #00e5b0;
-        }
+        .tab.active { color: #00e5b0; border-bottom: 2px solid #00e5b0; }
         
         .contacts-list, .requests-list, .discover-list {
             flex: 1;
@@ -151,9 +134,7 @@
             border-bottom: 1px solid #2a3458;
         }
         
-        .contact-item:active {
-            background: rgba(255,255,255,0.05);
-        }
+        .contact-item:active { background: rgba(255,255,255,0.05); }
         
         .contact-avatar {
             width: 50px;
@@ -166,24 +147,11 @@
             font-size: 22px;
         }
         
-        .contact-info {
-            flex: 1;
-        }
+        .contact-info { flex: 1; }
+        .contact-name { font-weight: 500; font-size: 16px; }
+        .contact-status { font-size: 12px; color: #8696a0; }
         
-        .contact-name {
-            font-weight: 500;
-            font-size: 16px;
-        }
-        
-        .contact-status {
-            font-size: 12px;
-            color: #8696a0;
-        }
-        
-        .request-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .request-actions { display: flex; gap: 8px; }
         
         .accept-btn, .reject-btn, .add-btn {
             padding: 6px 12px;
@@ -244,10 +212,7 @@
             font-size: 18px;
         }
         
-        .chat-header h3 {
-            font-size: 16px;
-            font-weight: 500;
-        }
+        .chat-header h3 { font-size: 16px; font-weight: 500; }
         
         .chat-actions {
             display: flex;
@@ -277,9 +242,7 @@
             display: none;
         }
         
-        .three-dot-menu.show {
-            display: block;
-        }
+        .three-dot-menu.show { display: block; }
         
         .three-dot-menu button {
             display: block;
@@ -293,9 +256,7 @@
             cursor: pointer;
         }
         
-        .three-dot-menu button:hover {
-            background: #2a3458;
-        }
+        .three-dot-menu button:hover { background: #2a3458; }
         
         .messages-area {
             flex: 1;
@@ -343,16 +304,17 @@
             opacity: 0.6;
         }
         
-        .message-actions span {
-            cursor: pointer;
-        }
+        .message-actions span { cursor: pointer; }
         
+        /* Input Area - FIXED for mobile */
         .input-area {
+            display: none;
             padding: 12px 16px;
             background: #111520;
-            display: flex;
             gap: 10px;
             border-top: 1px solid #2a3458;
+            min-height: 70px;
+            width: 100%;
         }
         
         .input-area input {
@@ -366,9 +328,7 @@
             outline: none;
         }
         
-        .input-area input:focus {
-            background: #2a3458;
-        }
+        .input-area input:focus { background: #2a3458; }
         
         .input-area button {
             width: 44px;
@@ -404,10 +364,7 @@
             overflow-y: auto;
         }
         
-        .settings-content h3 {
-            margin-bottom: 20px;
-            color: #00e5b0;
-        }
+        .settings-content h3 { margin-bottom: 20px; color: #00e5b0; }
         
         .privacy-toggle {
             display: flex;
@@ -560,7 +517,7 @@
             </div>
         </div>
         
-        <div class="input-area" id="inputArea" style="display: none;">
+        <div class="input-area" id="inputArea">
             <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
             <input type="file" id="fileInput" style="display: none" onchange="sendImage()">
             <button onclick="sendMessage()">➤</button>
@@ -735,10 +692,17 @@
     async function openChat(user) {
         activeChat = user;
         document.getElementById('chatTitle').innerHTML = user.name;
-        document.getElementById('inputArea').style.display = 'flex';
+        const inputArea = document.getElementById('inputArea');
+        inputArea.style.display = 'flex';
+        inputArea.style.visibility = 'visible';
         document.getElementById('chatAvatar').innerHTML = user.avatar || user.name.charAt(0);
         await loadMessages();
         closeSidebar();
+        
+        setTimeout(() => {
+            const input = document.getElementById('messageInput');
+            if (input) input.focus();
+        }, 200);
     }
 
     async function loadMessages() {
@@ -1031,28 +995,24 @@
         document.getElementById('threeDotMenu').classList.remove('show');
     }
     
-    function blockCurrentUser() {
+    async function blockCurrentUser() {
         if (activeChat) {
-            blockUser(activeChat.id);
-            closeThreeDotMenu();
-        }
-    }
-    
-    async function blockUser(userId) {
-        if (confirm(`Block ${activeChat?.name}? They won't be able to message you.`)) {
-            await fetch('/api/block-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: currentUser.id, blockUserId: userId })
-            });
-            showNotify('User blocked');
-            loadContacts();
-            loadDiscoverUsers();
-            loadBlockedUsers();
-            activeChat = null;
-            document.getElementById('chatTitle').innerHTML = 'Select a chat';
-            document.getElementById('inputArea').style.display = 'none';
-            document.getElementById('messagesArea').innerHTML = '<div style="text-align: center; color: #8696a0; margin-top: 50px;">💬 Select a contact to start chatting<br>🔒 Messages are end-to-end encrypted</div>';
+            if (confirm(`Block ${activeChat.name}? They won't be able to message you.`)) {
+                await fetch('/api/block-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser.id, blockUserId: activeChat.id })
+                });
+                showNotify('User blocked');
+                loadContacts();
+                loadDiscoverUsers();
+                loadBlockedUsers();
+                activeChat = null;
+                document.getElementById('chatTitle').innerHTML = 'Select a chat';
+                document.getElementById('inputArea').style.display = 'none';
+                document.getElementById('messagesArea').innerHTML = '<div style="text-align: center; color: #8696a0; margin-top: 50px;">💬 Select a contact to start chatting<br>🔒 Messages are end-to-end encrypted</div>';
+                closeThreeDotMenu();
+            }
         }
     }
     
@@ -1104,7 +1064,8 @@
     
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.chat-actions')) {
-            document.getElementById('threeDotMenu').classList.remove('show');
+            const menu = document.getElementById('threeDotMenu');
+            if (menu) menu.classList.remove('show');
         }
     });
 </script>
