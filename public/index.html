@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CipherChat - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0a0d14;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 400px;
+            width: 90%;
+            margin: 50px auto;
+            padding: 30px;
+            background: #111520;
+            border-radius: 16px;
+            border: 1px solid #00e5b0;
+            text-align: center;
+        }
+        h2 { color: #00e5b0; margin-bottom: 10px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #1e2640;
+            border: 1px solid #2a3458;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #00e5b0;
+            color: black;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { opacity: 0.9; }
+        .secondary-btn { background: #2a3458; color: white; }
+        .message { margin-top: 10px; font-size: 14px; }
+        .error { color: #ff4d6d; }
+        .success { color: #00e5b0; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="loginContainer" class="container">
+    <h2>🔐 CipherChat</h2>
+    <p style="font-size:12px; margin-bottom:20px;">Private & Secure End-to-End Encrypted Chat</p>
+    
+    <div id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" value="alice@example.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="12345678">
+        <button onclick="doLogin()">Login 🔒</button>
+        <button onclick="showSignup()" class="secondary-btn">📝 Create Account</button>
+        <div id="loginMessage" class="message"></div>
+    </div>
+    
+    <div id="signupForm" class="hidden">
+        <input type="text" id="signupName" placeholder="Full Name">
+        <input type="email" id="signupEmail" placeholder="Email">
+        <input type="password" id="signupPassword" placeholder="Password (min 6 chars)">
+        <input type="text" id="signupPhone" placeholder="Phone (optional)">
+        <button onclick="doSignup()">Create Account</button>
+        <button onclick="showLogin()" class="secondary-btn">← Back to Login</button>
+        <div id="signupMessage" class="message"></div>
+    </div>
+</div>
+
+<script>
+    async function doLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const msgDiv = document.getElementById('loginMessage');
+        msgDiv.innerHTML = '🔄 Logging in...';
+        msgDiv.className = 'message';
+        
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+                msgDiv.innerHTML = '✅ Login successful! Redirecting...';
+                msgDiv.className = 'message success';
+                setTimeout(() => { window.location.href = '/home'; }, 1000);
+            } else {
+                msgDiv.innerHTML = '❌ ' + (data.error || 'Invalid credentials');
+                msgDiv.className = 'message error';
+            }
+        } catch(err) {
+            msgDiv.innerHTML = '❌ Connection error';
+            msgDiv.className = 'message error';
+        }
+    }
+    
+    async function doSignup() {
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const phone = document.getElementById('signupPhone').value;
+        const msgDiv = document.getElementById('signupMessage');
+        
+        if (!name || !email || password.length < 6) {
+            msgDiv.innerHTML = '❌ Please fill all fields (password min 6 chars)';
+            msgDiv.className = 'message error';
+            return;
+        }
+        msgDiv.innerHTML = '🔄 Creating account...';
+        msgDiv.className = 'message';
+        
+        try {
+            const res = await fetch('/api/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, phone })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                msgDiv.innerHTML = '✅ Account created! Please login.';
+                msgDiv.className = 'message success';
+                setTimeout(() => showLogin(), 1500);
+            } else {
+                msgDiv.innerHTML = '❌ ' + (data.error || 'Signup failed');
+                msgDiv.className = 'message error';
+            }
+        } catch(err) {
+            msgDiv.innerHTML = '❌ Connection error';
+            msgDiv.className = 'message error';
+        }
+    }
+    
+    function showLogin() {
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('signupForm').classList.add('hidden');
+        document.getElementById('loginMessage').innerHTML = '';
+    }
+    
+    function showSignup() {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('signupForm').classList.remove('hidden');
+        document.getElementById('signupMessage').innerHTML = '';
+    }
+</script>
+</body>
+</html>

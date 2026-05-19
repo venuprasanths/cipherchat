@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CipherChat - Home</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0a0d14;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .app-container { display: flex; height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: #111520;
+            border-right: 1px solid #2a3458;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #2a3458; }
+        .sidebar-header h2 { color: #00e5b0; }
+        
+        .user-info {
+            padding: 15px 20px;
+            border-bottom: 1px solid #2a3458;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #00e5b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid #2a3458;
+        }
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #8891aa;
+            font-size: 13px;
+        }
+        .nav-tab.active { color: #00e5b0; border-bottom: 2px solid #00e5b0; }
+        
+        .contacts-list, .requests-list, .discover-list, .settings-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .contact, .request-item, .discover-user {
+            padding: 12px;
+            margin: 5px 0;
+            background: #1e2640;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact:hover, .request-item:hover, .discover-user:hover { background: #2a3458; }
+        .contact.active { background: rgba(0,229,176,0.2); border-left: 3px solid #00e5b0; }
+        .contact-name { font-weight: bold; }
+        .contact-status { font-size: 11px; color: #00e5b0; }
+        
+        .request-actions { display: flex; gap: 8px; }
+        .request-actions button { width: auto; padding: 5px 12px; margin: 0; font-size: 12px; }
+        .accept-btn { background: #00e5b0; color: black; }
+        .reject-btn { background: #ff4d6d; color: white; }
+        .block-btn { background: none; border: 1px solid #ff4d6d; color: #ff4d6d; }
+        
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 15px 20px;
+            background: #111520;
+            border-bottom: 1px solid #2a3458;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h3 { color: #00e5b0; }
+        .chat-actions { display: flex; gap: 8px; }
+        .chat-actions button {
+            width: auto;
+            padding: 8px 12px;
+            font-size: 12px;
+            margin: 0;
+            background: #1e2640;
+            border: 1px solid #2a3458;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            word-wrap: break-word;
+        }
+        .message.sent {
+            background: linear-gradient(135deg, #00e5b0, #0077ff);
+            color: #0a0d14;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .message.received {
+            background: #1e2640;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .message-time { font-size: 10px; opacity: 0.7; margin-top: 5px; }
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 10px;
+            opacity: 0.6;
+        }
+        .message-actions span { cursor: pointer; }
+        .message-actions span:hover { opacity: 1; }
+        
+        .input-area {
+            padding: 20px;
+            background: #111520;
+            border-top: 1px solid #2a3458;
+            display: flex;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            background: #1e2640;
+            border: 1px solid #2a3458;
+            border-radius: 24px;
+            color: white;
+            font-size: 14px;
+        }
+        .input-area button {
+            width: auto;
+            padding: 12px 24px;
+            background: #00e5b0;
+            color: black;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .hidden { display: none; }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #00e5b0;
+            color: black;
+            padding: 10px 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .reaction-picker {
+            position: fixed;
+            background: #1e2640;
+            border-radius: 25px;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+            border: 1px solid #00e5b0;
+        }
+        .reaction-emoji { font-size: 24px; cursor: pointer; padding: 5px; border-radius: 50%; }
+        .reaction-emoji:hover { background: #2a3458; transform: scale(1.2); }
+        .recording-active { background: #ff4d6d !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .privacy-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        .privacy-toggle input { width: auto; margin: 0; }
+        .file-preview { max-width: 150px; max-height: 120px; border-radius: 8px; cursor: pointer; }
+        audio { max-width: 180px; height: 35px; }
+        hr { margin: 15px 0; border-color: #2a3458; }
+    </style>
+</head>
+<body>
+
+<div id="appContainer" class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Cipher<span style="color:white;">Chat</span></h2>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">👤</div>
+            <div>
+                <strong id="userName"></strong><br>
+                <span style="font-size:11px; color:#00e5b0;" id="userPrivacyBadge">🔒 Private Account</span>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('chats')">💬 Chats</button>
+            <button class="nav-tab" onclick="switchTab('requests')">📨 Requests</button>
+            <button class="nav-tab" onclick="switchTab('discover')">🔍 Discover</button>
+            <button class="nav-tab" onclick="switchTab('settings')">⚙️ Settings</button>
+        </div>
+        
+        <div id="chatsTab" class="contacts-list"></div>
+        <div id="requestsTab" class="requests-list hidden"></div>
+        <div id="discoverTab" class="discover-list hidden"></div>
+        <div id="settingsTab" class="settings-list hidden">
+            <div style="padding: 15px;">
+                <h4 style="margin-bottom: 15px;">Privacy Settings</h4>
+                <div class="privacy-toggle">
+                    <input type="checkbox" id="privateAccountToggle" onchange="togglePrivacy()">
+                    <label>🔒 Private Account (Only approved contacts can message you)</label>
+                </div>
+                <hr>
+                <h4 style="margin-bottom: 10px;">Blocked Users</h4>
+                <div id="blockedList"></div>
+                <hr>
+                <button onclick="deleteAccount()" style="background:#ff4d6d; color:white; width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; cursor:pointer;">🗑️ Delete My Account</button>
+            </div>
+        </div>
+        
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+    
+    <!-- Chat Area -->
+    <div class="chat-area">
+        <div class="chat-header">
+            <h3 id="chatTitle">Select a contact</h3>
+            <div class="chat-actions">
+                <button onclick="document.getElementById('fileInput').click()">📎 Image</button>
+                <button id="voiceBtn" onclick="toggleRecording()">🎤 Voice</button>
+                <input type="file" id="fileInput" style="display:none" accept="image/*" onchange="sendImage()">
+            </div>
+        </div>
+        <div class="messages-area" id="messagesArea">
+            <div style="text-align:center; color:#8891aa; margin-top:50px;">
+                💬 Select a contact to start chatting<br>
+                🔒 End-to-End Encrypted
+            </div>
+        </div>
+        <div class="input-area" id="inputArea" style="display:none;">
+            <input type="text" id="messageInput" placeholder="Type your encrypted message..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Send 🔒</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+    let activeChat = null;
+    let allMessages = [];
+    let refreshInterval = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    // Load user from storage
+    const savedUser = localStorage.getItem('user');
+    if (!savedUser) {
+        window.location.href = '/';
+    } else {
+        currentUser = JSON.parse(savedUser);
+        loadApp();
+    }
+
+    async function loadApp() {
+        document.getElementById('userName').innerText = currentUser.name;
+        document.getElementById('userAvatar').innerHTML = currentUser.avatar || currentUser.name.charAt(0);
+        document.getElementById('privateAccountToggle').checked = currentUser.is_private === 1;
+        document.getElementById('userPrivacyBadge').innerHTML = currentUser.is_private ? '🔒 Private Account' : '🌐 Public Account';
+        
+        await loadContacts();
+        await loadPendingRequests();
+        await loadDiscoverUsers();
+        await loadBlockedUsers();
+        
+        if (refreshInterval) clearInterval(refreshInterval);
+        refreshInterval = setInterval(() => {
+            if (activeChat) loadMessages();
+            loadPendingRequests();
+        }, 3000);
+    }
+
+    async function loadContacts() {
+        try {
+            const res = await fetch(`/api/contacts/${currentUser.id}`);
+            const contacts = await res.json();
+            const container = document.getElementById('chatsTab');
+            container.innerHTML = '<div style="padding:10px; color:#8891aa;">📋 YOUR CONTACTS</div>';
+            
+            if (contacts.length === 0) {
+                container.innerHTML += '<div style="padding:20px; text-align:center; color:#8891aa;">No contacts yet.<br>Go to Discover tab to find users!</div>';
+                return;
+            }
+            
+            contacts.forEach(contact => {
+                const div = document.createElement('div');
+                div.className = `contact ${activeChat && activeChat.id === contact.id ? 'active' : ''}`;
+                div.innerHTML = `<div><div class="contact-name">${contact.name}</div><div class="contact-status">🔒 Encrypted</div></div>`;
+                div.onclick = () => openChat(contact);
+                container.appendChild(div);
+            });
+        } catch(e) { console.log(e); }
+    }
+
+    async function loadPendingRequests() {
+        try {
+            const res = await fetch(`/api/pending-requests/${currentUser.id}`);
+            const requests = await res.json();
+            const container = document.getElementById('requestsTab');
+            container.innerHTML = '<div style="padding:10px; color:#8891aa;">📨 CONTACT REQUESTS</div>';
+            
+            if (requests.length === 0) {
+                container.innerHTML += '<div style="padding:20px; text-align:center; color:#8891aa;">No pending requests</div>';
+                return;
+            }
+            
+            requests.forEach(req => {
+                const div = document.createElement('div');
+                div.className = 'request-item';
+                div.innerHTML = `
+                    <div><div class="contact-name">${req.name}</div></div>
+                    <div class="request-actions">
+                        <button class="accept-btn" onclick="respondToRequest(${req.id}, true)">Accept</button>
+                        <button class="reject-btn" onclick="respondToRequest(${req.id}, false)">Reject</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        } catch(e) { console.log(e); }
+    }
+
+    async function loadDiscoverUsers() {
+        try {
+            const res = await fetch(`/api/discover-users/${currentUser.id}`);
+            const users = await res.json();
+            const container = document.getElementById('discoverTab');
+            container.innerHTML = '<div style="padding:10px; color:#8891aa;">🔍 DISCOVER USERS</div>';
+            
+            if (users.length === 0) {
+                container.innerHTML += '<div style="padding:20px; text-align:center; color:#8891aa;">No users found to connect with</div>';
+                return;
+            }
+            
+            users.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'discover-user';
+                div.innerHTML = `
+                    <div><div class="contact-name">${user.name}</div></div>
+                    <button onclick="sendContactRequest(${user.id})" style="width:auto; padding:5px 12px; margin:0;">➕ Add</button>
+                `;
+                container.appendChild(div);
+            });
+        } catch(e) { console.log(e); }
+    }
+
+    async function loadBlockedUsers() {
+        try {
+            const res = await fetch(`/api/blocked-users/${currentUser.id}`);
+            const blocked = await res.json();
+            const container = document.getElementById('blockedList');
+            container.innerHTML = '';
+            
+            if (blocked.length === 0) {
+                container.innerHTML = '<div style="color:#8891aa;">No blocked users</div>';
+                return;
+            }
+            
+            blocked.forEach(user => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:#1e2640; margin:5px 0; border-radius:8px;';
+                div.innerHTML = `<span>${user.name}</span><button onclick="unblockUser(${user.id})" style="width:auto; padding:4px 10px; margin:0; background:#00e5b0; color:black; border:none; border-radius:5px;">Unblock</button>`;
+                container.appendChild(div);
+            });
+        } catch(e) { console.log(e); }
+    }
+
+    async function loadMessages() {
+        if (!activeChat) return;
+        try {
+            const res = await fetch(`/api/all-messages/${currentUser.id}/${activeChat.id}`);
+            allMessages = await res.json();
+            refreshChat();
+        } catch(e) { console.log(e); }
+    }
+
+        function refreshChat() {
+        if (!activeChat) return;
+        const container = document.getElementById('messagesArea');
+        container.innerHTML = '';
+        
+        if (allMessages.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#8891aa;">No messages yet. Send a message!</div>';
+            return;
+        }
+        
+        allMessages.forEach(msg => {
+            const isFromMe = msg.from_user === currentUser.id;
+            const div = document.createElement('div');
+            div.className = `message ${isFromMe ? 'sent' : 'received'}`;
+            const time = new Date(msg.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+            
+            // Build reactions HTML
+            let reactionsHtml = '';
+            if (msg.reactions && msg.reactions.length > 0) {
+                // Group reactions by emoji
+                const reactionCounts = {};
+                msg.reactions.forEach(r => {
+                    reactionCounts[r.reaction] = (reactionCounts[r.reaction] || 0) + 1;
+                });
+                reactionsHtml = '<div class="reactions" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">';
+                for (const [emoji, count] of Object.entries(reactionCounts)) {
+                    reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${emoji}')" style="background:rgba(255,255,255,0.15); padding:2px 8px; border-radius:16px; font-size:12px; cursor:pointer;">${emoji} ${count}</span>`;
+                }
+                reactionsHtml += '</div>';
+            }
+            
+            div.innerHTML = `
+                ${escapeHtml(msg.message)}
+                ${msg.edited ? '<span style="font-size:9px;"> (edited)</span>' : ''}
+                <div class="message-time">${time} 🔒 AES-256</div>
+                ${reactionsHtml}
+                <div class="message-actions">
+                    <span onclick="replyTo('${escapeHtml(msg.message)}')">↩️ Reply</span>
+                    ${isFromMe ? `<span onclick="editMsg(${msg.id}, '${escapeHtml(msg.message)}')">✏️ Edit</span>` : ''}
+                    ${isFromMe ? `<span onclick="deleteMsg(${msg.id})">🗑️ Delete</span>` : ''}
+                    <span onclick="showReactionPicker(${msg.id})">😊 React</span>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function openChat(user) {
+        activeChat = user;
+        document.getElementById('chatTitle').innerHTML = `💬 ${user.name}`;
+        document.getElementById('inputArea').style.display = 'flex';
+        await loadMessages();
+        loadContacts();
+    }
+
+    async function sendContactRequest(userId) {
+        const message = prompt('Add a message (optional):', 'Hi! I would like to connect with you.');
+        if (message === null) return;
+        
+        const res = await fetch('/api/send-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fromUserId: currentUser.id, toUserId: userId, message: message || '' })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showNotify('Contact request sent!');
+            loadDiscoverUsers();
+        } else {
+            showNotify(data.error || 'Request failed');
+        }
+    }
+
+    async function respondToRequest(requestId, accept) {
+        await fetch('/api/respond-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId, accept })
+        });
+        showNotify(accept ? 'Contact accepted!' : 'Request rejected');
+        loadPendingRequests();
+        loadContacts();
+        loadDiscoverUsers();
+        if (accept && activeChat) loadMessages();
+    }
+
+    async function togglePrivacy() {
+        const isPrivate = document.getElementById('privateAccountToggle').checked ? 1 : 0;
+        await fetch('/api/update-privacy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, isPrivate })
+        });
+        currentUser.is_private = isPrivate;
+        document.getElementById('userPrivacyBadge').innerHTML = isPrivate ? '🔒 Private Account' : '🌐 Public Account';
+        showNotify(isPrivate ? 'Account is now private' : 'Account is now public');
+        loadDiscoverUsers();
+    }
+
+    async function deleteAccount() {
+        const password = prompt('Enter your password to confirm account deletion:');
+        if (!password) return;
+        if (confirm('WARNING: This will permanently delete all your data. This cannot be undone. Are you sure?')) {
+            const res = await fetch('/api/delete-account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showNotify('Account deleted successfully');
+                setTimeout(() => logout(), 2000);
+            } else {
+                showNotify(data.error || 'Failed to delete account');
+            }
+        }
+    }
+
+    async function unblockUser(blockUserId) {
+        await fetch('/api/unblock-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, blockUserId })
+        });
+        showNotify('User unblocked');
+        loadBlockedUsers();
+        loadDiscoverUsers();
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (!text || !activeChat) return;
+        
+        const res = await fetch('/api/send-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: text })
+        });
+        if (res.ok) {
+            input.value = '';
+            await loadMessages();
+            showNotify('Message sent ✓');
+        }
+    }
+
+    async function sendImage() {
+        const file = document.getElementById('fileInput').files[0];
+        if (!file || !activeChat) return;
+        const formData = new FormData();
+        formData.append('file', file);
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+            await fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: uploadData.fileUrl, isFile: true, fileName: uploadData.fileName })
+            });
+            await loadMessages();
+            showNotify('Image sent ✓');
+        }
+        document.getElementById('fileInput').value = '';
+    }
+
+    async function deleteMsg(msgId) {
+        if (!confirm('Delete this message?')) return;
+        await fetch('/api/delete-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messageId: msgId, userId: currentUser.id })
+        });
+        await loadMessages();
+        showNotify('Message deleted');
+    }
+
+    async function editMsg(msgId, oldText) {
+        const newText = prompt('Edit message:', oldText);
+        if (!newText || newText === oldText) return;
+        await fetch('/api/edit-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messageId: msgId, newMessage: newText, userId: currentUser.id })
+        });
+        await loadMessages();
+        showNotify('Message edited');
+    }
+
+        async function addReaction(messageId, reaction) {
+        const res = await fetch('/api/add-reaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messageId, userId: currentUser.id, reaction })
+        });
+        const data = await res.json();
+        if (data.success) {
+            // Update the reactions in local messages
+            const msgIndex = allMessages.findIndex(m => m.id === messageId);
+            if (msgIndex !== -1) {
+                allMessages[msgIndex].reactions = data.reactions;
+                refreshChat();
+            }
+            showNotify(`Reaction ${reaction} added`);
+        }
+    }
+
+    function showReactionPicker(messageId) {
+        const reactions = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🎉', '😍'];
+        const existing = document.querySelector('.reaction-picker');
+        if (existing) existing.remove();
+        const picker = document.createElement('div');
+        picker.className = 'reaction-picker';
+        reactions.forEach(emoji => {
+            const span = document.createElement('span');
+            span.className = 'reaction-emoji';
+            span.innerHTML = emoji;
+            span.onclick = () => { addReaction(messageId, emoji); picker.remove(); };
+            picker.appendChild(span);
+        });
+        document.body.appendChild(picker);
+        const rect = event.target.getBoundingClientRect();
+        picker.style.left = (rect.left - 80) + 'px';
+        picker.style.top = (rect.top - 50) + 'px';
+        setTimeout(() => { if (picker.parentNode) picker.remove(); }, 5000);
+    }
+
+    function replyTo(msg) {
+        document.getElementById('messageInput').value = `↩️ ${msg.substring(0, 50)}\n`;
+        document.getElementById('messageInput').focus();
+    }
+
+    async function toggleRecording() {
+        if (isRecording) { stopRecording(); return; }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const formData = new FormData();
+                formData.append('file', audioBlob, 'voice-message.webm');
+                const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+                const uploadData = await uploadRes.json();
+                if (uploadData.success && activeChat) {
+                    await fetch('/api/send-message', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: uploadData.fileUrl, isFile: true, fileName: 'voice-message.webm' })
+                    });
+                    await loadMessages();
+                    showNotify('Voice message sent ✓');
+                }
+                stream.getTracks().forEach(t => t.stop());
+            };
+            mediaRecorder.start();
+            isRecording = true;
+            const btn = document.getElementById('voiceBtn');
+            btn.innerHTML = '🔴 Recording...';
+            btn.classList.add('recording-active');
+            showNotify('Recording... Click again to stop');
+            setTimeout(() => { if (isRecording) stopRecording(); }, 60000);
+        } catch(e) { showNotify('Microphone access denied'); }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder?.state === 'recording') {
+            mediaRecorder.stop();
+            isRecording = false;
+            const btn = document.getElementById('voiceBtn');
+            btn.innerHTML = '🎤 Voice';
+            btn.classList.remove('recording-active');
+        }
+    }
+
+    function switchTab(tab) {
+        document.getElementById('chatsTab').classList.add('hidden');
+        document.getElementById('requestsTab').classList.add('hidden');
+        document.getElementById('discoverTab').classList.add('hidden');
+        document.getElementById('settingsTab').classList.add('hidden');
+        document.getElementById(`${tab}Tab`).classList.remove('hidden');
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        if (tab === 'requests') loadPendingRequests();
+        if (tab === 'discover') loadDiscoverUsers();
+        if (tab === 'settings') loadBlockedUsers();
+    }
+
+    function escapeHtml(text) { if (!text) return ''; return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function showNotify(msg) { const n = document.createElement('div'); n.className = 'notification'; n.innerHTML = msg; document.body.appendChild(n); setTimeout(() => n.remove(), 2000); }
+    function logout() { localStorage.clear(); if (refreshInterval) clearInterval(refreshInterval); window.location.href = '/'; }
+</script>
+</body>
+</html>
