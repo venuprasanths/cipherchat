@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>CipherChat</title>
+    <title>CipherChat - Secure Chat</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -15,26 +15,53 @@
             overflow: hidden;
         }
         
-        /* Main Layout */
+        /* Main Layout - Mobile First */
         .app-container {
             display: flex;
             height: 100vh;
+            position: relative;
         }
         
-        /* Sidebar */
+        /* Sidebar - Hidden by default on mobile */
         .sidebar {
-            width: 360px;
+            width: 85%;
+            max-width: 320px;
             background: #111520;
-            border-right: 1px solid #2a3458;
+            position: fixed;
+            left: -100%;
+            top: 0;
+            height: 100%;
+            z-index: 1000;
+            transition: left 0.3s ease;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .sidebar.open {
+            left: 0;
+        }
+        
+        /* Overlay when sidebar is open */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
         }
         
         .sidebar-header {
-            padding: 16px 20px;
-            background: #111520;
+            padding: 20px;
             border-bottom: 1px solid #2a3458;
+            background: #111520;
         }
         
         .sidebar-header h2 {
@@ -43,9 +70,9 @@
             color: #00e5b0;
         }
         
-        /* User Profile */
+        /* User Profile in Sidebar */
         .user-profile {
-            padding: 12px 20px;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -83,6 +110,7 @@
             display: flex;
             border-bottom: 1px solid #2a3458;
             padding: 0 10px;
+            background: #111520;
         }
         
         .tab {
@@ -103,9 +131,10 @@
         }
         
         /* Lists */
-        .contacts-list, .requests-list, .discover-list, .settings-list {
+        .contacts-list, .requests-list, .discover-list {
             flex: 1;
             overflow-y: auto;
+            padding: 0;
         }
         
         .contact-item, .request-item, .discover-item {
@@ -117,12 +146,8 @@
             border-bottom: 1px solid #2a3458;
         }
         
-        .contact-item:hover, .request-item:hover, .discover-item:hover {
+        .contact-item:active, .request-item:active, .discover-item:active {
             background: rgba(255,255,255,0.05);
-        }
-        
-        .contact-item.active {
-            background: rgba(0,229,176,0.1);
         }
         
         .contact-avatar {
@@ -156,36 +181,38 @@
             gap: 8px;
         }
         
-        .accept-btn {
+        .accept-btn, .reject-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .accept-btn { background: #00e5b0; color: #0a0d14; }
+        .reject-btn { background: #ff4d6d; color: white; }
+        
+        .add-btn {
             background: #00e5b0;
             color: #0a0d14;
             border: none;
             padding: 6px 12px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
         }
         
-        .reject-btn {
-            background: #ff4d6d;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        /* Chat Area */
+        /* Chat Area - Takes full width on mobile */
         .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             background: #0e1219;
+            width: 100%;
         }
         
         /* Chat Header */
         .chat-header {
-            padding: 12px 20px;
+            padding: 12px 16px;
             background: #111520;
             display: flex;
             justify-content: space-between;
@@ -197,6 +224,18 @@
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+        
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #00e5b0;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .chat-header-avatar {
@@ -217,7 +256,8 @@
         
         .chat-actions {
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            position: relative;
         }
         
         .chat-actions button {
@@ -226,20 +266,55 @@
             font-size: 20px;
             cursor: pointer;
             color: #8696a0;
+            padding: 8px;
         }
         
-        /* Messages */
+        /* 3-Dot Menu */
+        .three-dot-menu {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: #1e2640;
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 150px;
+            z-index: 200;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+        }
+        
+        .three-dot-menu.show {
+            display: block;
+        }
+        
+        .three-dot-menu button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .three-dot-menu button:hover {
+            background: #2a3458;
+        }
+        
+        /* Messages Area */
         .messages-area {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
         
         .message {
-            max-width: 65%;
+            max-width: 80%;
             padding: 8px 12px;
             border-radius: 18px;
             font-size: 14px;
@@ -273,15 +348,16 @@
             margin-top: 5px;
             font-size: 11px;
             opacity: 0.6;
+            flex-wrap: wrap;
         }
         
         .message-actions span {
             cursor: pointer;
         }
         
-        /* Input Area */
+        /* Input Area - Always visible when chat is open */
         .input-area {
-            padding: 12px 20px;
+            padding: 12px 16px;
             background: #111520;
             display: flex;
             gap: 10px;
@@ -337,6 +413,8 @@
             border-radius: 16px;
             padding: 24px;
             border: 1px solid #00e5b0;
+            max-height: 80%;
+            overflow-y: auto;
         }
         
         .settings-content h3 {
@@ -377,6 +455,7 @@
             font-size: 14px;
             z-index: 1000;
             animation: fadeIn 0.3s ease;
+            white-space: nowrap;
         }
         
         @keyframes fadeIn {
@@ -386,42 +465,26 @@
         
         .hidden { display: none; }
         
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
+        /* Desktop styles */
+        @media (min-width: 769px) {
             .sidebar {
-                position: fixed;
-                left: -100%;
-                top: 0;
-                height: 100%;
-                z-index: 100;
-                transition: left 0.3s ease;
-            }
-            
-            .sidebar.open {
+                position: relative;
                 left: 0;
+                width: 320px;
+                box-shadow: none;
             }
             
-            .chat-area {
-                width: 100%;
+            .overlay {
+                display: none;
+            }
+            
+            .menu-btn {
+                display: none;
             }
             
             .message {
-                max-width: 85%;
+                max-width: 65%;
             }
-            
-            .back-btn {
-                display: block;
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: #00e5b0;
-                cursor: pointer;
-                margin-right: 10px;
-            }
-        }
-        
-        .back-btn {
-            display: none;
         }
         
         .reaction-picker {
@@ -453,16 +516,38 @@
         }
         
         audio, .file-preview {
-            max-width: 200px;
+            max-width: 180px;
             border-radius: 10px;
+        }
+        
+        .close-sidebar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #8696a0;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .close-sidebar {
+                display: block;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+    
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
+        <button class="close-sidebar" onclick="closeSidebar()">✕</button>
         <div class="sidebar-header">
             <h2>CipherChat</h2>
         </div>
@@ -490,7 +575,7 @@
     <div class="chat-area">
         <div class="chat-header">
             <div class="chat-header-info">
-                <button class="back-btn" onclick="toggleSidebar()">←</button>
+                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
                 <div class="chat-header-avatar" id="chatAvatar">👤</div>
                 <div>
                     <h3 id="chatTitle">Select a chat</h3>
@@ -500,7 +585,12 @@
             <div class="chat-actions">
                 <button onclick="document.getElementById('fileInput').click()">📎</button>
                 <button id="voiceBtn" onclick="toggleRecording()">🎤</button>
-                <button onclick="openSettings()">⚙️</button>
+                <button onclick="showThreeDotMenu()">⋮</button>
+                <div class="three-dot-menu" id="threeDotMenu">
+                    <button onclick="openSettings()">Settings</button>
+                    <button onclick="blockCurrentUser()">Block User</button>
+                    <button onclick="clearChat()">Clear Chat</button>
+                </div>
             </div>
         </div>
         
@@ -654,7 +744,7 @@
                         <div class="contact-name">${user.name}</div>
                         <div class="contact-status">${user.is_private ? 'Private' : 'Public'}</div>
                     </div>
-                    <button onclick="sendContactRequest(${user.id})" style="background: #00e5b0; color: #0a0d14; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer;">Add</button>
+                    <button class="add-btn" onclick="sendContactRequest(${user.id})">Add</button>
                 `;
                 container.appendChild(div);
             });
@@ -689,11 +779,16 @@
         document.getElementById('chatAvatar').innerHTML = user.avatar || user.name.charAt(0);
         await loadMessages();
         
-        if (window.innerWidth <= 768) {
-            document.getElementById('sidebar').classList.remove('open');
-        }
+        // Close sidebar on mobile
+        closeSidebar();
         
+        // Update active state
         document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.contact-item').forEach(el => {
+            if (el.innerText.includes(user.name)) {
+                el.classList.add('active');
+            }
+        });
     }
 
     async function loadMessages() {
@@ -961,10 +1056,65 @@
     function openSettings() {
         loadBlockedUsers();
         document.getElementById('settingsModal').style.display = 'flex';
+        closeThreeDotMenu();
     }
 
     function closeSettings() {
         document.getElementById('settingsModal').style.display = 'none';
+    }
+
+    function showThreeDotMenu() {
+        const menu = document.getElementById('threeDotMenu');
+        menu.classList.toggle('show');
+        // Close after 3 seconds
+        setTimeout(() => menu.classList.remove('show'), 3000);
+    }
+    
+    function closeThreeDotMenu() {
+        document.getElementById('threeDotMenu').classList.remove('show');
+    }
+    
+    function blockCurrentUser() {
+        if (activeChat) {
+            blockUser(activeChat.id);
+            closeThreeDotMenu();
+        }
+    }
+    
+    async function blockUser(userId) {
+        if (confirm(`Block ${activeChat?.name}? They won't be able to message you.`)) {
+            await fetch('/api/block-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id, blockUserId: userId })
+            });
+            showNotify('User blocked');
+            loadContacts();
+            loadDiscoverUsers();
+            loadBlockedUsers();
+            // Clear current chat
+            activeChat = null;
+            document.getElementById('chatTitle').innerHTML = 'Select a chat';
+            document.getElementById('inputArea').style.display = 'none';
+            document.getElementById('messagesArea').innerHTML = '<div style="text-align: center; color: #8696a0; margin-top: 50px;">💬 Select a contact to start chatting<br>🔒 Messages are end-to-end encrypted</div>';
+        }
+    }
+    
+    function clearChat() {
+        if (confirm('Clear all messages?')) {
+            showNotify('Chat cleared (local only)');
+            closeThreeDotMenu();
+        }
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('overlay').classList.add('active');
+    }
+    
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('active');
     }
 
     function switchTab(tab) {
@@ -974,10 +1124,7 @@
         document.getElementById(`${tab}Tab`).classList.remove('hidden');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
-    }
-
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
+        closeSidebar();
     }
 
     function escapeHtml(text) {
@@ -998,6 +1145,16 @@
         if (refreshInterval) clearInterval(refreshInterval);
         window.location.href = '/';
     }
+    
+    // Close three dot menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.chat-actions')) {
+            document.getElementById('threeDotMenu').classList.remove('show');
+        }
+        if (!e.target.closest('.sidebar') && !e.target.closest('.menu-btn')) {
+            // Don't auto close - only manual close
+        }
+    });
 </script>
 </body>
 </html>
