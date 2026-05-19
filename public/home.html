@@ -5,41 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>CipherChat - Secure Chat</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #0a0d14;
-            color: white;
+            color: #e9edef;
             height: 100vh;
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
-        
-        /* Main Layout */
-        .app-container { display: flex; height: 100vh; }
-        
-        /* Sidebar */
+
+        /* Main Layout - WhatsApp Style */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar - Contact List */
         .sidebar {
-            width: 320px;
+            width: 360px;
             background: #111520;
             border-right: 1px solid #2a3458;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
         }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid #2a3458; }
-        .sidebar-header h2 { color: #00e5b0; font-size: 20px; }
-        
-        .user-info {
-            padding: 15px 20px;
+
+        /* Header */
+        .sidebar-header {
+            padding: 16px 20px;
+            background: #111520;
             border-bottom: 1px solid #2a3458;
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00e5b0;
+        }
+
+        /* User Profile */
+        .user-profile {
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
+            border-bottom: 1px solid #2a3458;
+            cursor: pointer;
         }
+
         .user-avatar {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: #00e5b0;
             display: flex;
@@ -47,204 +67,390 @@
             justify-content: center;
             font-size: 24px;
         }
-        
-        .nav-tabs {
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-privacy {
+            font-size: 12px;
+            color: #8696a0;
+        }
+
+        /* Tabs */
+        .tabs {
             display: flex;
             border-bottom: 1px solid #2a3458;
-            flex-wrap: wrap;
+            padding: 0 10px;
         }
-        .nav-tab {
+
+        .tab {
             flex: 1;
             padding: 12px;
             text-align: center;
             cursor: pointer;
             background: none;
             border: none;
-            color: #8891aa;
-            font-size: 13px;
+            color: #8696a0;
+            font-size: 14px;
+            font-weight: 500;
             transition: all 0.2s;
-            min-width: 70px;
         }
-        .nav-tab.active { color: #00e5b0; border-bottom: 2px solid #00e5b0; }
-        
+
+        .tab.active {
+            color: #00e5b0;
+            border-bottom: 2px solid #00e5b0;
+        }
+
+        /* Contact Lists */
         .contacts-list, .requests-list, .discover-list, .settings-list {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
         }
-        .contact, .request-item, .discover-user {
-            padding: 12px;
-            margin: 5px 0;
-            background: #1e2640;
-            border-radius: 10px;
-            cursor: pointer;
+
+        .contact-item, .request-item, .discover-item {
+            padding: 12px 16px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 12px;
+            cursor: pointer;
             transition: background 0.2s;
+            border-bottom: 1px solid #2a3458;
         }
-        .contact:hover, .request-item:hover, .discover-user:hover { background: #2a3458; }
-        .contact:active { background: #2a3458; transform: scale(0.99); }
-        .contact.active { background: rgba(0,229,176,0.2); border-left: 3px solid #00e5b0; }
-        .contact-name { font-weight: bold; font-size: 15px; }
-        .contact-status { font-size: 11px; color: #00e5b0; margin-top: 2px; }
-        
-        .request-actions { display: flex; gap: 8px; }
-        .request-actions button { width: auto; padding: 5px 12px; margin: 0; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; }
-        .accept-btn { background: #00e5b0; color: black; }
-        .reject-btn { background: #ff4d6d; color: white; }
-        .block-btn { background: none; border: 1px solid #ff4d6d; color: #ff4d6d; }
-        
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .contact-item.active {
+            background: rgba(0,229,176,0.1);
+        }
+
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #00e5b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .contact-status {
+            font-size: 12px;
+            color: #8696a0;
+        }
+
+        /* Request Buttons */
+        .request-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .accept-btn {
+            background: #00e5b0;
+            color: #0a0d14;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .reject-btn {
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
         /* Chat Area */
         .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
+            background: #0e1219;
         }
+
+        /* Chat Header */
         .chat-header {
-            padding: 15px 20px;
+            padding: 12px 20px;
             background: #111520;
-            border-bottom: 1px solid #2a3458;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            border-bottom: 1px solid #2a3458;
         }
-        .chat-header h3 { color: #00e5b0; font-size: 16px; }
-        .chat-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #00e5b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .chat-header h3 {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 15px;
+        }
+
         .chat-actions button {
-            width: auto;
-            padding: 8px 12px;
-            font-size: 12px;
-            margin: 0;
-            background: #1e2640;
-            border: 1px solid #2a3458;
-            color: white;
+            background: none;
+            border: none;
+            font-size: 20px;
             cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s;
+            color: #8696a0;
         }
-        .chat-actions button:active { transform: scale(0.96); }
-        
+
+        /* Messages Area */
         .messages-area {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
+
+        /* Message Bubbles - WhatsApp Style */
         .message {
-            max-width: 70%;
-            padding: 10px 15px;
+            max-width: 65%;
+            padding: 8px 12px;
             border-radius: 18px;
             font-size: 14px;
+            position: relative;
             word-wrap: break-word;
         }
+
         .message.sent {
-            background: linear-gradient(135deg, #00e5b0, #0077ff);
-            color: #0a0d14;
+            background: #005c4b;
+            color: white;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
+
         .message.received {
-            background: #1e2640;
+            background: #202c33;
             color: white;
             align-self: flex-start;
             border-bottom-left-radius: 4px;
         }
-        .message-time { font-size: 10px; opacity: 0.7; margin-top: 5px; }
+
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
         .message-actions {
             display: flex;
             gap: 8px;
             margin-top: 5px;
-            font-size: 10px;
+            font-size: 11px;
             opacity: 0.6;
-            flex-wrap: wrap;
         }
-        .message-actions span { cursor: pointer; padding: 2px 4px; }
-        .message-actions span:active { opacity: 1; }
-        
+
+        .message-actions span {
+            cursor: pointer;
+        }
+
         .reactions {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px;
             margin-top: 5px;
         }
+
         .reaction-badge {
             background: rgba(255,255,255,0.15);
-            padding: 2px 8px;
-            border-radius: 16px;
-            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
             cursor: pointer;
-            transition: background 0.2s;
         }
-        .reaction-badge:active { background: rgba(255,255,255,0.3); }
-        
+
+        /* Input Area */
         .input-area {
-            padding: 20px;
+            padding: 12px 20px;
             background: #111520;
-            border-top: 1px solid #2a3458;
             display: flex;
             gap: 10px;
+            border-top: 1px solid #2a3458;
         }
+
         .input-area input {
             flex: 1;
             padding: 12px;
             background: #1e2640;
-            border: 1px solid #2a3458;
-            border-radius: 24px;
-            color: white;
-            font-size: 14px;
-            outline: none;
-        }
-        .input-area input:focus { border-color: #00e5b0; }
-        .input-area button {
-            width: auto;
-            padding: 12px 24px;
-            background: #00e5b0;
-            color: black;
             border: none;
             border-radius: 24px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.1s;
+            color: white;
+            font-size: 15px;
+            outline: none;
         }
-        .input-area button:active { transform: scale(0.96); }
-        
-        .logout-btn {
-            width: 100%;
-            padding: 10px;
+
+        .input-area input:focus {
+            background: #2a3458;
+        }
+
+        .input-area button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #00e5b0;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            padding: 20px;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-item h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #8696a0;
+        }
+
+        .privacy-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .privacy-toggle input {
+            width: 40px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
             background: #ff4d6d;
             color: white;
             border: none;
+            padding: 12px;
             border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .logout-btn {
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
             cursor: pointer;
             margin-top: 10px;
-            transition: opacity 0.2s;
         }
-        .logout-btn:active { opacity: 0.8; }
-        
-        .hidden { display: none; }
-        
+
+        .hidden {
+            display: none;
+        }
+
+        /* Notification */
         .notification {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            left: auto;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
             background: #00e5b0;
-            color: black;
-            padding: 10px 15px;
-            border-radius: 10px;
+            color: #0a0d14;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
             z-index: 1000;
-            animation: slideIn 0.3s ease;
-            max-width: 80%;
-            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(100%); }
-            to { opacity: 1; transform: translateX(0); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                left: -100%;
+                top: 0;
+                height: 100%;
+                z-index: 100;
+                transition: left 0.3s ease;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .chat-area {
+                width: 100%;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .back-btn {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #00e5b0;
+                cursor: pointer;
+                margin-right: 10px;
+            }
+        }
+        
+        .back-btn {
+            display: none;
         }
         
         .reaction-picker {
@@ -256,168 +462,28 @@
             gap: 8px;
             z-index: 1000;
             border: 1px solid #00e5b0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .reaction-emoji { font-size: 24px; cursor: pointer; padding: 5px; border-radius: 50%; transition: transform 0.1s; }
-        .reaction-emoji:active { transform: scale(1.2); background: #2a3458; }
-        
-        .recording-active { background: #ff4d6d !important; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        
-        .privacy-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            font-size: 13px;
-        }
-        .privacy-toggle input { width: auto; margin: 0; transform: scale(1.2); cursor: pointer; }
-        .file-preview { max-width: 150px; max-height: 120px; border-radius: 8px; cursor: pointer; }
-        audio { max-width: 180px; height: 35px; border-radius: 20px; }
-        hr { margin: 15px 0; border-color: #2a3458; }
-        
-        /* ============ MOBILE RESPONSIVE ============ */
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                height: auto;
-                max-height: 42vh;
-                border-right: none;
-                border-bottom: 1px solid #2a3458;
-                overflow-y: auto;
-            }
-            
-            .chat-area {
-                height: 58vh;
-            }
-            
-            .sidebar-header {
-                padding: 12px 15px;
-            }
-            
-            .sidebar-header h2 {
-                font-size: 18px;
-            }
-            
-            .user-info {
-                padding: 10px 15px;
-            }
-            
-            .user-avatar {
-                width: 35px;
-                height: 35px;
-                font-size: 18px;
-            }
-            
-            .user-info strong {
-                font-size: 14px;
-            }
-            
-            .nav-tab {
-                padding: 8px;
-                font-size: 11px;
-            }
-            
-            .contact, .request-item, .discover-user {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-            
-            .contact-name {
-                font-size: 13px;
-            }
-            
-            .chat-header {
-                padding: 10px 15px;
-            }
-            
-            .chat-header h3 {
-                font-size: 14px;
-            }
-            
-            .chat-actions button {
-                padding: 6px 10px;
-                font-size: 10px;
-            }
-            
-            .message {
-                max-width: 85%;
-                font-size: 13px;
-                padding: 8px 12px;
-            }
-            
-            .messages-area {
-                padding: 12px;
-            }
-            
-            .input-area {
-                padding: 10px;
-            }
-            
-            .input-area input {
-                padding: 10px;
-                font-size: 14px;
-            }
-            
-            .input-area button {
-                padding: 10px 18px;
-            }
-            
-            .reaction-badge {
-                font-size: 10px;
-                padding: 1px 6px;
-            }
-            
-            .message-actions {
-                font-size: 9px;
-                gap: 6px;
-            }
-            
-            .notification {
-                bottom: 10px;
-                right: 10px;
-                left: auto;
-                font-size: 12px;
-                padding: 8px 12px;
-            }
         }
         
-        /* For very small phones */
-        @media (max-width: 480px) {
-            .sidebar {
-                max-height: 38vh;
-            }
-            
-            .chat-area {
-                height: 62vh;
-            }
-            
-            .nav-tab {
-                padding: 6px;
-                font-size: 10px;
-            }
-            
-            .message {
-                max-width: 90%;
-            }
-            
-            .chat-actions {
-                gap: 5px;
-            }
-            
-            .chat-actions button {
-                padding: 5px 8px;
-                font-size: 9px;
-            }
-            
-            .request-actions button {
-                padding: 4px 8px;
-                font-size: 10px;
-            }
+        .reaction-emoji {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .recording-active {
+            background: #ff4d6d !important;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        audio, .file-preview {
+            max-width: 200px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -425,66 +491,82 @@
 
 <div id="appContainer" class="app-container">
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2>Cipher<span style="color:white;">Chat</span></h2>
+            <h2>CipherChat</h2>
         </div>
-        <div class="user-info">
+        
+        <div class="user-profile" onclick="showProfileSettings()">
             <div class="user-avatar" id="userAvatar">👤</div>
-            <div>
-                <strong id="userName"></strong><br>
-                <span style="font-size:11px; color:#00e5b0;" id="userPrivacyBadge">🔒 Private Account</span>
+            <div class="user-details">
+                <div class="user-name" id="userName">User</div>
+                <div class="user-privacy" id="userPrivacyBadge">🔒 Private</div>
             </div>
         </div>
         
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('chats')">💬 Chats</button>
-            <button class="nav-tab" onclick="switchTab('requests')">📨 Requests</button>
-            <button class="nav-tab" onclick="switchTab('discover')">🔍 Discover</button>
-            <button class="nav-tab" onclick="switchTab('settings')">⚙️ Settings</button>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('chats')">Chats</button>
+            <button class="tab" onclick="switchTab('requests')">Requests</button>
+            <button class="tab" onclick="switchTab('discover')">Discover</button>
         </div>
         
         <div id="chatsTab" class="contacts-list"></div>
         <div id="requestsTab" class="requests-list hidden"></div>
         <div id="discoverTab" class="discover-list hidden"></div>
-        <div id="settingsTab" class="settings-list hidden">
-            <div style="padding: 15px;">
-                <h4 style="margin-bottom: 15px;">Privacy Settings</h4>
-                <div class="privacy-toggle">
-                    <input type="checkbox" id="privateAccountToggle" onchange="togglePrivacy()">
-                    <label>🔒 Private Account (Only approved contacts can message you)</label>
-                </div>
-                <hr>
-                <h4 style="margin-bottom: 10px;">Blocked Users</h4>
-                <div id="blockedList"></div>
-                <hr>
-                <button onclick="deleteAccount()" style="background:#ff4d6d; color:white; width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; cursor:pointer;">🗑️ Delete My Account</button>
-            </div>
-        </div>
-        
-        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
     </div>
     
     <!-- Chat Area -->
     <div class="chat-area">
         <div class="chat-header">
-            <h3 id="chatTitle">Select a contact</h3>
+            <div class="chat-header-info">
+                <button class="back-btn" onclick="toggleSidebar()">←</button>
+                <div class="chat-header-avatar" id="chatAvatar">👤</div>
+                <div>
+                    <h3 id="chatTitle">Select a chat</h3>
+                    <div style="font-size: 11px; color: #8696a0;">🔒 End-to-end encrypted</div>
+                </div>
+            </div>
             <div class="chat-actions">
-                <button onclick="document.getElementById('fileInput').click()">📎 Image</button>
-                <button id="voiceBtn" onclick="toggleRecording()">🎤 Voice</button>
-                <input type="file" id="fileInput" style="display:none" accept="image/*" onchange="sendImage()">
+                <button onclick="document.getElementById('fileInput').click()">📎</button>
+                <button id="voiceBtn" onclick="toggleRecording()">🎤</button>
+                <button onclick="showSettings()">⚙️</button>
             </div>
         </div>
+        
         <div class="messages-area" id="messagesArea">
-            <div style="text-align:center; color:#8891aa; margin-top:50px;">
+            <div style="text-align: center; color: #8696a0; margin-top: 50px;">
                 💬 Select a contact to start chatting<br>
-                🔒 End-to-End Encrypted
+                🔒 Messages are end-to-end encrypted
             </div>
         </div>
-        <div class="input-area" id="inputArea" style="display:none;">
-            <input type="text" id="messageInput" placeholder="Type your encrypted message..." onkeypress="if(event.key==='Enter') sendMessage()">
-            <button onclick="sendMessage()">Send 🔒</button>
+        
+        <div class="input-area" id="inputArea" style="display: none;">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <input type="file" id="fileInput" style="display: none" onchange="sendImage()">
+            <button onclick="sendMessage()">➤</button>
         </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: #111520; width: 90%; max-width: 350px; border-radius: 16px; padding: 24px; border: 1px solid #00e5b0;">
+        <h3 style="margin-bottom: 20px; color: #00e5b0;">Settings</h3>
+        
+        <div class="setting-item">
+            <h4>Privacy</h4>
+            <div class="privacy-toggle">
+                <input type="checkbox" id="privateToggle" onchange="updatePrivacy()">
+                <label>Private Account (Only approved contacts can message you)</label>
+            </div>
+        </div>
+        
+        <h4 style="margin: 15px 0 10px; color: #8696a0;">Blocked Users</h4>
+        <div id="blockedList"></div>
+        
+        <button class="delete-btn" onclick="deleteAccount()">Delete My Account</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+        <button onclick="closeSettings()" style="background: #2a3458; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px;">Close</button>
     </div>
 </div>
 
@@ -496,7 +578,6 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
-    let currentTab = 'chats';
 
     // Load user from storage
     const savedUser = localStorage.getItem('user');
@@ -510,8 +591,8 @@
     async function loadApp() {
         document.getElementById('userName').innerText = currentUser.name;
         document.getElementById('userAvatar').innerHTML = currentUser.avatar || currentUser.name.charAt(0);
-        document.getElementById('privateAccountToggle').checked = currentUser.is_private === 1;
-        document.getElementById('userPrivacyBadge').innerHTML = currentUser.is_private ? '🔒 Private Account' : '🌐 Public Account';
+        document.getElementById('privateToggle').checked = currentUser.is_private === 1;
+        document.getElementById('userPrivacyBadge').innerHTML = currentUser.is_private ? '🔒 Private' : '🌐 Public';
         
         await loadContacts();
         await loadPendingRequests();
@@ -530,17 +611,23 @@
             const res = await fetch(`/api/contacts/${currentUser.id}`);
             const contacts = await res.json();
             const container = document.getElementById('chatsTab');
-            container.innerHTML = '<div style="padding:10px; color:#8891aa;">📋 YOUR CONTACTS</div>';
+            container.innerHTML = '';
             
             if (contacts.length === 0) {
-                container.innerHTML += '<div style="padding:20px; text-align:center; color:#8891aa;">No contacts yet.<br>Go to Discover tab to find users!</div>';
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #8696a0;">No contacts yet.<br>Go to Discover tab to find users!</div>';
                 return;
             }
             
             contacts.forEach(contact => {
                 const div = document.createElement('div');
-                div.className = `contact ${activeChat && activeChat.id === contact.id ? 'active' : ''}`;
-                div.innerHTML = `<div><div class="contact-name">${contact.name}</div><div class="contact-status">🔒 Encrypted</div></div>`;
+                div.className = `contact-item ${activeChat && activeChat.id === contact.id ? 'active' : ''}`;
+                div.innerHTML = `
+                    <div class="contact-avatar">${contact.avatar || contact.name.charAt(0)}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${contact.name}</div>
+                        <div class="contact-status">🔒 Encrypted</div>
+                    </div>
+                `;
                 div.onclick = () => openChat(contact);
                 container.appendChild(div);
             });
@@ -552,10 +639,10 @@
             const res = await fetch(`/api/pending-requests/${currentUser.id}`);
             const requests = await res.json();
             const container = document.getElementById('requestsTab');
-            container.innerHTML = '<div style="padding:10px; color:#8891aa;">📨 CONTACT REQUESTS</div>';
+            container.innerHTML = '';
             
             if (requests.length === 0) {
-                container.innerHTML += '<div style="padding:20px; text-align:center; color:#8891aa;">No pending requests</div>';
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #8696a0;">No pending requests</div>';
                 return;
             }
             
@@ -563,7 +650,11 @@
                 const div = document.createElement('div');
                 div.className = 'request-item';
                 div.innerHTML = `
-                    <div><div class="contact-name">${req.name}</div></div>
+                    <div class="contact-avatar">${req.avatar || req.name.charAt(0)}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${req.name}</div>
+                        ${req.message ? `<div class="contact-status">💬 ${req.message}</div>` : ''}
+                    </div>
                     <div class="request-actions">
                         <button class="accept-btn" onclick="respondToRequest(${req.id}, true)">Accept</button>
                         <button class="reject-btn" onclick="respondToRequest(${req.id}, false)">Reject</button>
@@ -579,19 +670,23 @@
             const res = await fetch(`/api/discover-users/${currentUser.id}`);
             const users = await res.json();
             const container = document.getElementById('discoverTab');
-            container.innerHTML = '<div style="padding:10px; color:#8891aa;">🔍 DISCOVER USERS</div>';
+            container.innerHTML = '';
             
             if (users.length === 0) {
-                container.innerHTML += '<div style="padding:20px; text-align:center; color:#8891aa;">No users found to connect with</div>';
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #8696a0;">No users found</div>';
                 return;
             }
             
             users.forEach(user => {
                 const div = document.createElement('div');
-                div.className = 'discover-user';
+                div.className = 'discover-item';
                 div.innerHTML = `
-                    <div><div class="contact-name">${user.name}</div></div>
-                    <button onclick="sendContactRequest(${user.id})" style="width:auto; padding:5px 12px; margin:0;">➕ Add</button>
+                    <div class="contact-avatar">${user.avatar || user.name.charAt(0)}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${user.name}</div>
+                        <div class="contact-status">${user.is_private ? 'Private' : 'Public'}</div>
+                    </div>
+                    <button onclick="sendContactRequest(${user.id})" style="background: #00e5b0; color: #0a0d14; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer;">Add</button>
                 `;
                 container.appendChild(div);
             });
@@ -606,48 +701,51 @@
             container.innerHTML = '';
             
             if (blocked.length === 0) {
-                container.innerHTML = '<div style="color:#8891aa;">No blocked users</div>';
+                container.innerHTML = '<div style="color: #8696a0;">No blocked users</div>';
                 return;
             }
             
             blocked.forEach(user => {
                 const div = document.createElement('div');
-                div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:#1e2640; margin:5px 0; border-radius:8px;';
-                div.innerHTML = `<span>${user.name}</span><button onclick="unblockUser(${user.id})" style="width:auto; padding:4px 10px; margin:0; background:#00e5b0; color:black; border:none; border-radius:5px;">Unblock</button>`;
+                div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #1e2640; margin: 5px 0; border-radius: 8px;';
+                div.innerHTML = `<span>${user.name}</span><button onclick="unblockUser(${user.id})" style="background: #00e5b0; border: none; padding: 4px 10px; border-radius: 5px; cursor: pointer;">Unblock</button>`;
                 container.appendChild(div);
             });
         } catch(e) { console.log(e); }
     }
 
-        async function loadMessages() {
+    async function openChat(user) {
+        activeChat = user;
+        document.getElementById('chatTitle').innerHTML = user.name;
+        document.getElementById('inputArea').style.display = 'flex';
+        document.getElementById('chatAvatar').innerHTML = user.avatar || user.name.charAt(0);
+        await loadMessages();
+        
+        // Close sidebar on mobile
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+        
+        // Update active state
+        document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+    }
+
+    async function loadMessages() {
         if (!activeChat) return;
         try {
             const res = await fetch(`/api/all-messages/${currentUser.id}/${activeChat.id}`);
-            const data = await res.json();
-            console.log('📩 Loaded messages:', data);
-            
-            // Map the messages to ensure they have a message property
-            allMessages = data.map(msg => {
-                // Log each message to debug
-                console.log('Message data:', msg);
-                return {
-                    ...msg,
-                    message: msg.message || msg.encrypted_message || 'Message'
-                };
-            });
+            allMessages = await res.json();
             refreshChat();
-        } catch(e) { 
-            console.error('Load messages error:', e);
-        }
+        } catch(e) { console.log(e); }
     }
 
-        function refreshChat() {
+    function refreshChat() {
         if (!activeChat) return;
         const container = document.getElementById('messagesArea');
         container.innerHTML = '';
         
         if (allMessages.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#8891aa; padding:20px;">No messages yet. Send a message!</div>';
+            container.innerHTML = '<div style="text-align: center; color: #8696a0; padding: 20px;">No messages yet. Send a message!</div>';
             return;
         }
         
@@ -655,61 +753,24 @@
             const isFromMe = msg.from_user === currentUser.id;
             const div = document.createElement('div');
             div.className = `message ${isFromMe ? 'sent' : 'received'}`;
-            const time = new Date(msg.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+            const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            // FIXED: Get the actual message text
-            let messageText = '';
+            let content = msg.message || msg.encrypted_message || '';
             
-            // Check different possible field names
-            if (msg.message) {
-                messageText = msg.message;
-            } else if (msg.encrypted_message) {
-                messageText = msg.encrypted_message;
-            } else if (msg.text) {
-                messageText = msg.text;
-            } else {
-                messageText = 'Message';
-            }
-            
-            // For debugging - log to console
-            console.log('Displaying message:', messageText);
-            
-            // Handle image messages
-            if (msg.is_file && messageText && (messageText.match(/\.(jpg|jpeg|png|gif|webp)$/i) || messageText.includes('/uploads/'))) {
-                messageText = `<img src="${messageText}" class="file-preview" onclick="window.open('${messageText}')" style="max-width:150px; max-height:120px; border-radius:8px; cursor:pointer;"><br><small>📷 Image</small>`;
-            }
-            // Handle voice messages
-            else if (msg.is_file && msg.file_name === 'voice-message.webm') {
-                messageText = `<audio controls src="${messageText}" style="max-width:180px; height:35px;"></audio><br><small>🎤 Voice message</small>`;
-            }
-            // Handle file downloads
-            else if (msg.is_file && messageText) {
-                messageText = `<a href="${messageText}" download style="color:${isFromMe ? '#0a0d14' : 'white'};">📎 ${msg.file_name || 'Download'}</a>`;
-            }
-            
-            // Build reactions HTML
-            let reactionsHtml = '';
-            if (msg.reactions && msg.reactions.length > 0) {
-                const reactionCounts = {};
-                msg.reactions.forEach(r => {
-                    reactionCounts[r.reaction] = (reactionCounts[r.reaction] || 0) + 1;
-                });
-                reactionsHtml = '<div class="reactions" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">';
-                for (const [emoji, count] of Object.entries(reactionCounts)) {
-                    reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${emoji}')" style="background:rgba(255,255,255,0.15); padding:2px 8px; border-radius:16px; font-size:12px; cursor:pointer;">${emoji} ${count}</span>`;
+            if (msg.is_file && content) {
+                if (content.match(/\.(jpg|jpeg|png|gif)$/i)) {
+                    content = `<img src="${content}" style="max-width: 150px; max-height: 120px; border-radius: 8px; cursor: pointer;" onclick="window.open('${content}')"><br><small>📷 Image</small>`;
+                } else if (msg.file_name === 'voice-message.webm') {
+                    content = `<audio controls src="${content}"></audio><br><small>🎤 Voice</small>`;
                 }
-                reactionsHtml += '</div>';
             }
             
-            // Build the message HTML with visible text content
             div.innerHTML = `
-                <div style="word-wrap: break-word; white-space: pre-wrap;">${messageText}</div>
-                ${msg.edited ? '<span style="font-size:9px;"> (edited)</span>' : ''}
-                <div class="message-time">${time} 🔒 AES-256</div>
-                ${reactionsHtml}
+                ${content}
+                <div class="message-time">${time} 🔒</div>
                 <div class="message-actions">
-                    <span onclick="replyTo('${escapeHtml(messageText.toString().substring(0, 50))}')">↩️ Reply</span>
-                    ${isFromMe ? `<span onclick="editMsg(${msg.id}, '${escapeHtml(messageText.toString())}')">✏️ Edit</span>` : ''}
+                    <span onclick="replyTo('${escapeHtml(content)}')">↩️ Reply</span>
+                    ${isFromMe ? `<span onclick="editMsg(${msg.id}, '${escapeHtml(content)}')">✏️ Edit</span>` : ''}
                     ${isFromMe ? `<span onclick="deleteMsg(${msg.id})">🗑️ Delete</span>` : ''}
                     <span onclick="showReactionPicker(${msg.id})">😊 React</span>
                 </div>
@@ -719,18 +780,47 @@
         container.scrollTop = container.scrollHeight;
     }
 
-    async function openChat(user) {
-        activeChat = user;
-        document.getElementById('chatTitle').innerHTML = `💬 ${user.name}`;
-        document.getElementById('inputArea').style.display = 'flex';
-        await loadMessages();
-        loadContacts();
+    async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (!text || !activeChat) return;
+        
+        const res = await fetch('/api/send-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: text })
+        });
+        
+        if (res.ok) {
+            input.value = '';
+            await loadMessages();
+            showNotify('Message sent');
+        }
+    }
+
+    async function sendImage() {
+        const file = document.getElementById('fileInput').files[0];
+        if (!file || !activeChat) return;
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+        const uploadData = await uploadRes.json();
+        
+        if (uploadData.success) {
+            await fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: uploadData.fileUrl, isFile: true, fileName: uploadData.fileName })
+            });
+            await loadMessages();
+            showNotify('Image sent');
+        }
+        document.getElementById('fileInput').value = '';
     }
 
     async function sendContactRequest(userId) {
-        const message = prompt('Add a message (optional):', 'Hi! I would like to connect with you.');
-        if (message === null) return;
-        
+        const message = prompt('Add a message (optional):');
         const res = await fetch('/api/send-request', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -738,7 +828,7 @@
         });
         const data = await res.json();
         if (data.success) {
-            showNotify('Contact request sent!');
+            showNotify('Request sent!');
             loadDiscoverUsers();
         } else {
             showNotify(data.error || 'Request failed');
@@ -751,57 +841,83 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ requestId, accept })
         });
-        showNotify(accept ? 'Contact accepted!' : 'Request rejected');
+        showNotify(accept ? 'Contact added!' : 'Request rejected');
         loadPendingRequests();
         loadContacts();
         loadDiscoverUsers();
-        if (accept && activeChat) loadMessages();
     }
 
-    async function togglePrivacy() {
-        const isPrivate = document.getElementById('privateAccountToggle').checked ? 1 : 0;
+    async function updatePrivacy() {
+        const isPrivate = document.getElementById('privateToggle').checked ? 1 : 0;
         
-        try {
-            const res = await fetch('/api/update-privacy', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: currentUser.id, isPrivate })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                currentUser.is_private = isPrivate;
-                document.getElementById('userPrivacyBadge').innerHTML = isPrivate ? '🔒 Private Account' : '🌐 Public Account';
-                showNotify(isPrivate ? 'Account is now private' : 'Account is now public');
-                if (currentTab === 'discover') loadDiscoverUsers();
-            } else {
-                document.getElementById('privateAccountToggle').checked = !isPrivate;
-                showNotify('Failed to update privacy settings');
-            }
-        } catch(err) {
-            console.error(err);
-            document.getElementById('privateAccountToggle').checked = !isPrivate;
-            showNotify('Error updating privacy');
+        const res = await fetch('/api/update-privacy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, isPrivate })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            currentUser.is_private = isPrivate;
+            document.getElementById('userPrivacyBadge').innerHTML = isPrivate ? '🔒 Private' : '🌐 Public';
+            showNotify(isPrivate ? 'Account is now private' : 'Account is now public');
+        } else {
+            document.getElementById('privateToggle').checked = !isPrivate;
+            showNotify('Failed to update privacy');
         }
     }
 
-    async function deleteAccount() {
-        const password = prompt('Enter your password to confirm account deletion:');
-        if (!password) return;
-        if (confirm('WARNING: This will permanently delete all your data. This cannot be undone. Are you sure?')) {
-            const res = await fetch('/api/delete-account', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: currentUser.id, password })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                showNotify('Account deleted successfully');
-                setTimeout(() => logout(), 2000);
-            } else {
-                showNotify(data.error || 'Failed to delete account');
-            }
-        }
+    async function deleteMsg(msgId) {
+        if (!confirm('Delete this message?')) return;
+        await fetch('/api/delete-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messageId: msgId, userId: currentUser.id })
+        });
+        await loadMessages();
+    }
+
+    async function editMsg(msgId, oldText) {
+        const newText = prompt('Edit message:', oldText);
+        if (!newText || newText === oldText) return;
+        await fetch('/api/edit-message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messageId: msgId, newMessage: newText, userId: currentUser.id })
+        });
+        await loadMessages();
+    }
+
+    async function addReaction(messageId, reaction) {
+        await fetch('/api/add-reaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messageId, userId: currentUser.id, reaction })
+        });
+        await loadMessages();
+    }
+
+    function showReactionPicker(messageId) {
+        const reactions = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🎉'];
+        const picker = document.createElement('div');
+        picker.className = 'reaction-picker';
+        reactions.forEach(emoji => {
+            const span = document.createElement('span');
+            span.className = 'reaction-emoji';
+            span.innerHTML = emoji;
+            span.onclick = () => { addReaction(messageId, emoji); picker.remove(); };
+            picker.appendChild(span);
+        });
+        document.body.appendChild(picker);
+        const rect = event.target.getBoundingClientRect();
+        picker.style.left = (rect.left - 80) + 'px';
+        picker.style.top = (rect.top - 50) + 'px';
+        setTimeout(() => picker.remove(), 3000);
+    }
+
+    function replyTo(msg) {
+        document.getElementById('messageInput').value = `↩️ ${msg.substring(0, 50)}\n`;
+        document.getElementById('messageInput').focus();
     }
 
     async function unblockUser(blockUserId) {
@@ -815,122 +931,22 @@
         loadDiscoverUsers();
     }
 
-       async function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const text = input.value.trim();
-        if (!text || !activeChat) return;
-        
-        console.log('📤 Sending message:', text);
-        
-        try {
-            const res = await fetch('/api/send-message', {
+    async function deleteAccount() {
+        const password = prompt('Enter your password to delete account:');
+        if (!password) return;
+        if (confirm('Are you sure? This cannot be undone!')) {
+            const res = await fetch('/api/delete-account', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    from: currentUser.id, 
-                    to: activeChat.id, 
-                    message: text,
-                    isFile: false
-                })
+                body: JSON.stringify({ userId: currentUser.id, password })
             });
-            const data = await res.json();
-            console.log('Send response:', data);
-            
-            if (res.ok && data.success) {
-                input.value = '';
-                await loadMessages();
-                showNotify('Message sent ✓');
+            if (res.ok) {
+                showNotify('Account deleted');
+                setTimeout(() => logout(), 2000);
             } else {
-                showNotify('Failed to send message');
+                showNotify('Wrong password');
             }
-        } catch(err) {
-            console.error('Send error:', err);
-            showNotify('Error sending message');
         }
-    }
-
-    async function sendImage() {
-        const file = document.getElementById('fileInput').files[0];
-        if (!file || !activeChat) return;
-        const formData = new FormData();
-        formData.append('file', file);
-        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
-        const uploadData = await uploadRes.json();
-        if (uploadData.success) {
-            await fetch('/api/send-message', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: uploadData.fileUrl, isFile: true, fileName: uploadData.fileName })
-            });
-            await loadMessages();
-            showNotify('Image sent ✓');
-        }
-        document.getElementById('fileInput').value = '';
-    }
-
-    async function deleteMsg(msgId) {
-        if (!confirm('Delete this message?')) return;
-        await fetch('/api/delete-message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messageId: msgId, userId: currentUser.id })
-        });
-        await loadMessages();
-        showNotify('Message deleted');
-    }
-
-    async function editMsg(msgId, oldText) {
-        const newText = prompt('Edit message:', oldText);
-        if (!newText || newText === oldText) return;
-        await fetch('/api/edit-message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messageId: msgId, newMessage: newText, userId: currentUser.id })
-        });
-        await loadMessages();
-        showNotify('Message edited');
-    }
-
-    async function addReaction(messageId, reaction) {
-        const res = await fetch('/api/add-reaction', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messageId, userId: currentUser.id, reaction })
-        });
-        const data = await res.json();
-        if (data.success) {
-            const msgIndex = allMessages.findIndex(m => m.id === messageId);
-            if (msgIndex !== -1) {
-                allMessages[msgIndex].reactions = data.reactions;
-                refreshChat();
-            }
-            showNotify(`Reaction ${reaction} added`);
-        }
-    }
-
-    function showReactionPicker(messageId) {
-        const reactions = ['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🎉', '😍'];
-        const existing = document.querySelector('.reaction-picker');
-        if (existing) existing.remove();
-        const picker = document.createElement('div');
-        picker.className = 'reaction-picker';
-        reactions.forEach(emoji => {
-            const span = document.createElement('span');
-            span.className = 'reaction-emoji';
-            span.innerHTML = emoji;
-            span.onclick = () => { addReaction(messageId, emoji); picker.remove(); };
-            picker.appendChild(span);
-        });
-        document.body.appendChild(picker);
-        const rect = event.target.getBoundingClientRect();
-        picker.style.left = Math.min(rect.left - 80, window.innerWidth - 200) + 'px';
-        picker.style.top = (rect.top - 50) + 'px';
-        setTimeout(() => { if (picker.parentNode) picker.remove(); }, 5000);
-    }
-
-    function replyTo(msg) {
-        document.getElementById('messageInput').value = `↩️ ${msg.substring(0, 50)}\n`;
-        document.getElementById('messageInput').focus();
     }
 
     async function toggleRecording() {
@@ -953,14 +969,14 @@
                         body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: uploadData.fileUrl, isFile: true, fileName: 'voice-message.webm' })
                     });
                     await loadMessages();
-                    showNotify('Voice message sent ✓');
+                    showNotify('Voice message sent');
                 }
                 stream.getTracks().forEach(t => t.stop());
             };
             mediaRecorder.start();
             isRecording = true;
             const btn = document.getElementById('voiceBtn');
-            btn.innerHTML = '🔴 Recording...';
+            btn.innerHTML = '🔴';
             btn.classList.add('recording-active');
             showNotify('Recording... Click again to stop');
             setTimeout(() => { if (isRecording) stopRecording(); }, 60000);
@@ -972,39 +988,54 @@
             mediaRecorder.stop();
             isRecording = false;
             const btn = document.getElementById('voiceBtn');
-            btn.innerHTML = '🎤 Voice';
+            btn.innerHTML = '🎤';
             btn.classList.remove('recording-active');
         }
     }
 
+    function showSettings() {
+        loadBlockedUsers();
+        document.getElementById('settingsModal').style.display = 'flex';
+    }
+
+    function closeSettings() {
+        document.getElementById('settingsModal').style.display = 'none';
+    }
+
+    function showProfileSettings() {
+        showSettings();
+    }
+
     function switchTab(tab) {
-        currentTab = tab;
         document.getElementById('chatsTab').classList.add('hidden');
         document.getElementById('requestsTab').classList.add('hidden');
         document.getElementById('discoverTab').classList.add('hidden');
-        document.getElementById('settingsTab').classList.add('hidden');
         document.getElementById(`${tab}Tab`).classList.remove('hidden');
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
-        if (tab === 'requests') loadPendingRequests();
-        if (tab === 'discover') loadDiscoverUsers();
-        if (tab === 'settings') loadBlockedUsers();
     }
 
-    function escapeHtml(text) { if (!text) return ''; return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-    
-    function showNotify(msg) { 
-        const n = document.createElement('div'); 
-        n.className = 'notification'; 
-        n.innerHTML = msg; 
-        document.body.appendChild(n); 
-        setTimeout(() => n.remove(), 2000); 
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
     }
-    
-    function logout() { 
-        localStorage.clear(); 
-        if (refreshInterval) clearInterval(refreshInterval); 
-        window.location.href = '/'; 
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function showNotify(msg) {
+        const n = document.createElement('div');
+        n.className = 'notification';
+        n.innerHTML = msg;
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 2000);
+    }
+
+    function logout() {
+        localStorage.clear();
+        if (refreshInterval) clearInterval(refreshInterval);
+        window.location.href = '/';
     }
 </script>
 </body>
