@@ -2,81 +2,254 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>CipherChat - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>CipherChat - Secure Login</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #0a0d14;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0d14 0%, #111520 100%);
             color: white;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
+
         .container {
             max-width: 400px;
-            width: 90%;
-            margin: 50px auto;
-            padding: 30px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px 25px;
             background: #111520;
-            border-radius: 16px;
-            border: 1px solid #00e5b0;
-            text-align: center;
+            border-radius: 24px;
+            border: 1px solid rgba(0, 229, 176, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.5s ease;
         }
-        h2 { color: #00e5b0; margin-bottom: 10px; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: #00e5b0;
+            font-size: 28px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #8891aa;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #8891aa;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
         input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 14px 16px;
             background: #1e2640;
             border: 1px solid #2a3458;
-            border-radius: 8px;
+            border-radius: 12px;
             color: white;
             font-size: 16px;
+            transition: all 0.2s;
+            outline: none;
         }
+
+        input:focus {
+            border-color: #00e5b0;
+            box-shadow: 0 0 0 2px rgba(0, 229, 176, 0.1);
+        }
+
+        input::placeholder {
+            color: #4a5270;
+        }
+
         button {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 14px;
+            margin-top: 10px;
             background: #00e5b0;
-            color: black;
+            color: #0a0d14;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        button:hover { opacity: 0.9; }
-        .secondary-btn { background: #2a3458; color: white; }
-        .message { margin-top: 10px; font-size: 14px; }
-        .error { color: #ff4d6d; }
-        .success { color: #00e5b0; }
-        .hidden { display: none; }
+
+        button:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .secondary-btn {
+            background: #2a3458;
+            color: white;
+            margin-top: 8px;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .error {
+            background: rgba(255, 77, 109, 0.1);
+            color: #ff4d6d;
+            border: 1px solid rgba(255, 77, 109, 0.2);
+        }
+
+        .success {
+            background: rgba(0, 229, 176, 0.1);
+            color: #00e5b0;
+            border: 1px solid rgba(0, 229, 176, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #00e5b0;
+            background: rgba(0, 229, 176, 0.08);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 229, 176, 0.15);
+        }
+
+        .demo-info {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #2a3458;
+            font-size: 11px;
+            color: #8891aa;
+            text-align: center;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 20px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+            
+            input, button {
+                padding: 12px 14px;
+            }
+            
+            .badge {
+                font-size: 9px;
+                padding: 4px 8px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div id="loginContainer" class="container">
+<div class="container">
     <h2>🔐 CipherChat</h2>
-    <p style="font-size:12px; margin-bottom:20px;">Private & Secure End-to-End Encrypted Chat</p>
+    <div class="subtitle">Private & Secure End-to-End Encrypted Chat</div>
     
+    <!-- Login Form -->
     <div id="loginForm">
-        <input type="email" id="loginEmail" placeholder="Email" value="alice@example.com">
-        <input type="password" id="loginPassword" placeholder="Password" value="12345678">
+        <div class="input-group">
+            <label>📧 Email</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" value="alice@example.com">
+        </div>
+        <div class="input-group">
+            <label>🔒 Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" value="12345678">
+        </div>
         <button onclick="doLogin()">Login 🔒</button>
         <button onclick="showSignup()" class="secondary-btn">📝 Create Account</button>
-        <div id="loginMessage" class="message"></div>
+        <div id="loginMessage" class="message hidden"></div>
     </div>
     
+    <!-- Signup Form -->
     <div id="signupForm" class="hidden">
-        <input type="text" id="signupName" placeholder="Full Name">
-        <input type="email" id="signupEmail" placeholder="Email">
-        <input type="password" id="signupPassword" placeholder="Password (min 6 chars)">
-        <input type="text" id="signupPhone" placeholder="Phone (optional)">
-        <button onclick="doSignup()">Create Account</button>
+        <div class="input-group">
+            <label>👤 Full Name</label>
+            <input type="text" id="signupName" placeholder="Your name">
+        </div>
+        <div class="input-group">
+            <label>📧 Email</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com">
+        </div>
+        <div class="input-group">
+            <label>🔒 Password (min 6 chars)</label>
+            <input type="password" id="signupPassword" placeholder="••••••••">
+        </div>
+        <div class="input-group">
+            <label>📱 Phone (optional)</label>
+            <input type="tel" id="signupPhone" placeholder="+91 XXXXX XXXXX">
+        </div>
+        <button onclick="doSignup()">Create Account 🔐</button>
         <button onclick="showLogin()" class="secondary-btn">← Back to Login</button>
-        <div id="signupMessage" class="message"></div>
+        <div id="signupMessage" class="message hidden"></div>
+    </div>
+    
+    <!-- Security Badges -->
+    <div class="security-badges">
+        <span class="badge">🔒 End-to-End Encrypted</span>
+        <span class="badge">🛡️ Zero Trust</span>
+        <span class="badge">🔑 Signal Protocol</span>
+        <span class="badge">🚫 No Tracking</span>
+    </div>
+    
+    <div class="demo-info">
+        Demo accounts: alice@example.com / 12345678 &nbsp;|&nbsp; bob@example.com / 12345678
     </div>
 </div>
 
@@ -85,8 +258,10 @@
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const msgDiv = document.getElementById('loginMessage');
+        
+        msgDiv.classList.remove('hidden', 'error', 'success');
         msgDiv.innerHTML = '🔄 Logging in...';
-        msgDiv.className = 'message';
+        msgDiv.classList.add('success');
         
         try {
             const res = await fetch('/api/login', {
@@ -96,18 +271,28 @@
             });
             const data = await res.json();
             
-            if (res.ok) {
+            if (res.ok && data.success) {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 msgDiv.innerHTML = '✅ Login successful! Redirecting...';
-                msgDiv.className = 'message success';
-                setTimeout(() => { window.location.href = '/home'; }, 1000);
+                msgDiv.classList.add('success');
+                setTimeout(() => {
+                    window.location.href = '/home';
+                }, 800);
             } else {
-                msgDiv.innerHTML = '❌ ' + (data.error || 'Invalid credentials');
-                msgDiv.className = 'message error';
+                msgDiv.innerHTML = '❌ ' + (data.error || 'Invalid email or password');
+                msgDiv.classList.remove('success');
+                msgDiv.classList.add('error');
+                setTimeout(() => {
+                    msgDiv.classList.add('hidden');
+                }, 3000);
             }
         } catch(err) {
-            msgDiv.innerHTML = '❌ Connection error';
-            msgDiv.className = 'message error';
+            msgDiv.innerHTML = '❌ Connection error. Make sure server is running.';
+            msgDiv.classList.remove('success');
+            msgDiv.classList.add('error');
+            setTimeout(() => {
+                msgDiv.classList.add('hidden');
+            }, 3000);
         }
     }
     
@@ -118,13 +303,19 @@
         const phone = document.getElementById('signupPhone').value;
         const msgDiv = document.getElementById('signupMessage');
         
+        msgDiv.classList.remove('hidden', 'error', 'success');
+        
         if (!name || !email || password.length < 6) {
             msgDiv.innerHTML = '❌ Please fill all fields (password min 6 chars)';
-            msgDiv.className = 'message error';
+            msgDiv.classList.add('error');
+            setTimeout(() => {
+                msgDiv.classList.add('hidden');
+            }, 3000);
             return;
         }
+        
         msgDiv.innerHTML = '🔄 Creating account...';
-        msgDiv.className = 'message';
+        msgDiv.classList.add('success');
         
         try {
             const res = await fetch('/api/signup', {
@@ -134,30 +325,55 @@
             });
             const data = await res.json();
             
-            if (res.ok) {
-                msgDiv.innerHTML = '✅ Account created! Please login.';
-                msgDiv.className = 'message success';
-                setTimeout(() => showLogin(), 1500);
+            if (res.ok && data.success) {
+                msgDiv.innerHTML = '✅ Account created successfully! Please login.';
+                msgDiv.classList.add('success');
+                setTimeout(() => {
+                    showLogin();
+                    document.getElementById('loginEmail').value = email;
+                    document.getElementById('loginMessage').innerHTML = '✅ Account created! Please login.';
+                    document.getElementById('loginMessage').classList.remove('hidden');
+                    document.getElementById('loginMessage').classList.add('success');
+                    setTimeout(() => {
+                        document.getElementById('loginMessage').classList.add('hidden');
+                    }, 3000);
+                }, 1500);
             } else {
                 msgDiv.innerHTML = '❌ ' + (data.error || 'Signup failed');
-                msgDiv.className = 'message error';
+                msgDiv.classList.remove('success');
+                msgDiv.classList.add('error');
+                setTimeout(() => {
+                    msgDiv.classList.add('hidden');
+                }, 3000);
             }
         } catch(err) {
             msgDiv.innerHTML = '❌ Connection error';
-            msgDiv.className = 'message error';
+            msgDiv.classList.remove('success');
+            msgDiv.classList.add('error');
+            setTimeout(() => {
+                msgDiv.classList.add('hidden');
+            }, 3000);
         }
     }
     
     function showLogin() {
         document.getElementById('loginForm').classList.remove('hidden');
         document.getElementById('signupForm').classList.add('hidden');
-        document.getElementById('loginMessage').innerHTML = '';
+        document.getElementById('loginMessage').classList.add('hidden');
+        document.getElementById('signupMessage').classList.add('hidden');
     }
     
     function showSignup() {
         document.getElementById('loginForm').classList.add('hidden');
         document.getElementById('signupForm').classList.remove('hidden');
-        document.getElementById('signupMessage').innerHTML = '';
+        document.getElementById('loginMessage').classList.add('hidden');
+        document.getElementById('signupMessage').classList.add('hidden');
+    }
+    
+    // Check if already logged in
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+        window.location.href = '/home';
     }
 </script>
 </body>

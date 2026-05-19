@@ -2,16 +2,20 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>CipherChat - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>CipherChat - Secure Chat</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
             background: #0a0d14;
             color: white;
             height: 100vh;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        /* Main Layout */
         .app-container { display: flex; height: 100vh; }
         
         /* Sidebar */
@@ -21,9 +25,10 @@
             border-right: 1px solid #2a3458;
             display: flex;
             flex-direction: column;
+            transition: transform 0.3s ease;
         }
         .sidebar-header { padding: 20px; border-bottom: 1px solid #2a3458; }
-        .sidebar-header h2 { color: #00e5b0; }
+        .sidebar-header h2 { color: #00e5b0; font-size: 20px; }
         
         .user-info {
             padding: 15px 20px;
@@ -46,6 +51,7 @@
         .nav-tabs {
             display: flex;
             border-bottom: 1px solid #2a3458;
+            flex-wrap: wrap;
         }
         .nav-tab {
             flex: 1;
@@ -56,6 +62,8 @@
             border: none;
             color: #8891aa;
             font-size: 13px;
+            transition: all 0.2s;
+            min-width: 70px;
         }
         .nav-tab.active { color: #00e5b0; border-bottom: 2px solid #00e5b0; }
         
@@ -73,14 +81,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background 0.2s;
         }
         .contact:hover, .request-item:hover, .discover-user:hover { background: #2a3458; }
+        .contact:active { background: #2a3458; transform: scale(0.99); }
         .contact.active { background: rgba(0,229,176,0.2); border-left: 3px solid #00e5b0; }
-        .contact-name { font-weight: bold; }
-        .contact-status { font-size: 11px; color: #00e5b0; }
+        .contact-name { font-weight: bold; font-size: 15px; }
+        .contact-status { font-size: 11px; color: #00e5b0; margin-top: 2px; }
         
         .request-actions { display: flex; gap: 8px; }
-        .request-actions button { width: auto; padding: 5px 12px; margin: 0; font-size: 12px; }
+        .request-actions button { width: auto; padding: 5px 12px; margin: 0; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; }
         .accept-btn { background: #00e5b0; color: black; }
         .reject-btn { background: #ff4d6d; color: white; }
         .block-btn { background: none; border: 1px solid #ff4d6d; color: #ff4d6d; }
@@ -98,9 +108,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .chat-header h3 { color: #00e5b0; }
-        .chat-actions { display: flex; gap: 8px; }
+        .chat-header h3 { color: #00e5b0; font-size: 16px; }
+        .chat-actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .chat-actions button {
             width: auto;
             padding: 8px 12px;
@@ -111,7 +123,9 @@
             color: white;
             cursor: pointer;
             border-radius: 8px;
+            transition: all 0.2s;
         }
+        .chat-actions button:active { transform: scale(0.96); }
         
         .messages-area {
             flex: 1;
@@ -147,9 +161,26 @@
             margin-top: 5px;
             font-size: 10px;
             opacity: 0.6;
+            flex-wrap: wrap;
         }
-        .message-actions span { cursor: pointer; }
-        .message-actions span:hover { opacity: 1; }
+        .message-actions span { cursor: pointer; padding: 2px 4px; }
+        .message-actions span:active { opacity: 1; }
+        
+        .reactions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .reaction-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .reaction-badge:active { background: rgba(255,255,255,0.3); }
         
         .input-area {
             padding: 20px;
@@ -166,7 +197,9 @@
             border-radius: 24px;
             color: white;
             font-size: 14px;
+            outline: none;
         }
+        .input-area input:focus { border-color: #00e5b0; }
         .input-area button {
             width: auto;
             padding: 12px 24px;
@@ -176,7 +209,9 @@
             border-radius: 24px;
             cursor: pointer;
             font-weight: bold;
+            transition: transform 0.1s;
         }
+        .input-area button:active { transform: scale(0.96); }
         
         .logout-btn {
             width: 100%;
@@ -187,23 +222,31 @@
             border-radius: 8px;
             cursor: pointer;
             margin-top: 10px;
+            transition: opacity 0.2s;
         }
+        .logout-btn:active { opacity: 0.8; }
+        
         .hidden { display: none; }
+        
         .notification {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            left: auto;
             background: #00e5b0;
             color: black;
             padding: 10px 15px;
             border-radius: 10px;
             z-index: 1000;
             animation: slideIn 0.3s ease;
+            max-width: 80%;
+            word-wrap: break-word;
         }
         @keyframes slideIn {
             from { opacity: 0; transform: translateX(100%); }
             to { opacity: 1; transform: translateX(0); }
         }
+        
         .reaction-picker {
             position: fixed;
             background: #1e2640;
@@ -213,11 +256,14 @@
             gap: 8px;
             z-index: 1000;
             border: 1px solid #00e5b0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .reaction-emoji { font-size: 24px; cursor: pointer; padding: 5px; border-radius: 50%; }
-        .reaction-emoji:hover { background: #2a3458; transform: scale(1.2); }
+        .reaction-emoji { font-size: 24px; cursor: pointer; padding: 5px; border-radius: 50%; transition: transform 0.1s; }
+        .reaction-emoji:active { transform: scale(1.2); background: #2a3458; }
+        
         .recording-active { background: #ff4d6d !important; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        
         .privacy-toggle {
             display: flex;
             align-items: center;
@@ -225,10 +271,154 @@
             margin: 15px 0;
             font-size: 13px;
         }
-        .privacy-toggle input { width: auto; margin: 0; }
+        .privacy-toggle input { width: auto; margin: 0; transform: scale(1.2); cursor: pointer; }
         .file-preview { max-width: 150px; max-height: 120px; border-radius: 8px; cursor: pointer; }
-        audio { max-width: 180px; height: 35px; }
+        audio { max-width: 180px; height: 35px; border-radius: 20px; }
         hr { margin: 15px 0; border-color: #2a3458; }
+        
+        /* ============ MOBILE RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 42vh;
+                border-right: none;
+                border-bottom: 1px solid #2a3458;
+                overflow-y: auto;
+            }
+            
+            .chat-area {
+                height: 58vh;
+            }
+            
+            .sidebar-header {
+                padding: 12px 15px;
+            }
+            
+            .sidebar-header h2 {
+                font-size: 18px;
+            }
+            
+            .user-info {
+                padding: 10px 15px;
+            }
+            
+            .user-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+            
+            .user-info strong {
+                font-size: 14px;
+            }
+            
+            .nav-tab {
+                padding: 8px;
+                font-size: 11px;
+            }
+            
+            .contact, .request-item, .discover-user {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .contact-name {
+                font-size: 13px;
+            }
+            
+            .chat-header {
+                padding: 10px 15px;
+            }
+            
+            .chat-header h3 {
+                font-size: 14px;
+            }
+            
+            .chat-actions button {
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+            
+            .message {
+                max-width: 85%;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            
+            .messages-area {
+                padding: 12px;
+            }
+            
+            .input-area {
+                padding: 10px;
+            }
+            
+            .input-area input {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .input-area button {
+                padding: 10px 18px;
+            }
+            
+            .reaction-badge {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+            
+            .message-actions {
+                font-size: 9px;
+                gap: 6px;
+            }
+            
+            .notification {
+                bottom: 10px;
+                right: 10px;
+                left: auto;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+        
+        /* For very small phones */
+        @media (max-width: 480px) {
+            .sidebar {
+                max-height: 38vh;
+            }
+            
+            .chat-area {
+                height: 62vh;
+            }
+            
+            .nav-tab {
+                padding: 6px;
+                font-size: 10px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .chat-actions {
+                gap: 5px;
+            }
+            
+            .chat-actions button {
+                padding: 5px 8px;
+                font-size: 9px;
+            }
+            
+            .request-actions button {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -306,6 +496,7 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
+    let currentTab = 'chats';
 
     // Load user from storage
     const savedUser = localStorage.getItem('user');
@@ -437,13 +628,13 @@
         } catch(e) { console.log(e); }
     }
 
-        function refreshChat() {
+    function refreshChat() {
         if (!activeChat) return;
         const container = document.getElementById('messagesArea');
         container.innerHTML = '';
         
         if (allMessages.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#8891aa;">No messages yet. Send a message!</div>';
+            container.innerHTML = '<div style="text-align:center; color:#8891aa; padding:20px;">No messages yet. Send a message!</div>';
             return;
         }
         
@@ -456,14 +647,13 @@
             // Build reactions HTML
             let reactionsHtml = '';
             if (msg.reactions && msg.reactions.length > 0) {
-                // Group reactions by emoji
                 const reactionCounts = {};
                 msg.reactions.forEach(r => {
                     reactionCounts[r.reaction] = (reactionCounts[r.reaction] || 0) + 1;
                 });
-                reactionsHtml = '<div class="reactions" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">';
+                reactionsHtml = '<div class="reactions">';
                 for (const [emoji, count] of Object.entries(reactionCounts)) {
-                    reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${emoji}')" style="background:rgba(255,255,255,0.15); padding:2px 8px; border-radius:16px; font-size:12px; cursor:pointer;">${emoji} ${count}</span>`;
+                    reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${emoji}')">${emoji} ${count}</span>`;
                 }
                 reactionsHtml += '</div>';
             }
@@ -526,15 +716,29 @@
 
     async function togglePrivacy() {
         const isPrivate = document.getElementById('privateAccountToggle').checked ? 1 : 0;
-        await fetch('/api/update-privacy', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: currentUser.id, isPrivate })
-        });
-        currentUser.is_private = isPrivate;
-        document.getElementById('userPrivacyBadge').innerHTML = isPrivate ? '🔒 Private Account' : '🌐 Public Account';
-        showNotify(isPrivate ? 'Account is now private' : 'Account is now public');
-        loadDiscoverUsers();
+        
+        try {
+            const res = await fetch('/api/update-privacy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id, isPrivate })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                currentUser.is_private = isPrivate;
+                document.getElementById('userPrivacyBadge').innerHTML = isPrivate ? '🔒 Private Account' : '🌐 Public Account';
+                showNotify(isPrivate ? 'Account is now private' : 'Account is now public');
+                if (currentTab === 'discover') loadDiscoverUsers();
+            } else {
+                document.getElementById('privateAccountToggle').checked = !isPrivate;
+                showNotify('Failed to update privacy settings');
+            }
+        } catch(err) {
+            console.error(err);
+            document.getElementById('privateAccountToggle').checked = !isPrivate;
+            showNotify('Error updating privacy');
+        }
     }
 
     async function deleteAccount() {
@@ -626,7 +830,7 @@
         showNotify('Message edited');
     }
 
-        async function addReaction(messageId, reaction) {
+    async function addReaction(messageId, reaction) {
         const res = await fetch('/api/add-reaction', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -634,7 +838,6 @@
         });
         const data = await res.json();
         if (data.success) {
-            // Update the reactions in local messages
             const msgIndex = allMessages.findIndex(m => m.id === messageId);
             if (msgIndex !== -1) {
                 allMessages[msgIndex].reactions = data.reactions;
@@ -659,7 +862,7 @@
         });
         document.body.appendChild(picker);
         const rect = event.target.getBoundingClientRect();
-        picker.style.left = (rect.left - 80) + 'px';
+        picker.style.left = Math.min(rect.left - 80, window.innerWidth - 200) + 'px';
         picker.style.top = (rect.top - 50) + 'px';
         setTimeout(() => { if (picker.parentNode) picker.remove(); }, 5000);
     }
@@ -714,6 +917,7 @@
     }
 
     function switchTab(tab) {
+        currentTab = tab;
         document.getElementById('chatsTab').classList.add('hidden');
         document.getElementById('requestsTab').classList.add('hidden');
         document.getElementById('discoverTab').classList.add('hidden');
@@ -727,8 +931,20 @@
     }
 
     function escapeHtml(text) { if (!text) return ''; return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-    function showNotify(msg) { const n = document.createElement('div'); n.className = 'notification'; n.innerHTML = msg; document.body.appendChild(n); setTimeout(() => n.remove(), 2000); }
-    function logout() { localStorage.clear(); if (refreshInterval) clearInterval(refreshInterval); window.location.href = '/'; }
+    
+    function showNotify(msg) { 
+        const n = document.createElement('div'); 
+        n.className = 'notification'; 
+        n.innerHTML = msg; 
+        document.body.appendChild(n); 
+        setTimeout(() => n.remove(), 2000); 
+    }
+    
+    function logout() { 
+        localStorage.clear(); 
+        if (refreshInterval) clearInterval(refreshInterval); 
+        window.location.href = '/'; 
+    }
 </script>
 </body>
 </html>
