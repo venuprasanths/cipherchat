@@ -619,16 +619,29 @@
         } catch(e) { console.log(e); }
     }
 
-    async function loadMessages() {
+        async function loadMessages() {
         if (!activeChat) return;
         try {
             const res = await fetch(`/api/all-messages/${currentUser.id}/${activeChat.id}`);
-            allMessages = await res.json();
+            const data = await res.json();
+            console.log('📩 Loaded messages:', data);
+            
+            // Map the messages to ensure they have a message property
+            allMessages = data.map(msg => {
+                // Log each message to debug
+                console.log('Message data:', msg);
+                return {
+                    ...msg,
+                    message: msg.message || msg.encrypted_message || 'Message'
+                };
+            });
             refreshChat();
-        } catch(e) { console.log(e); }
+        } catch(e) { 
+            console.error('Load messages error:', e);
+        }
     }
 
-    function refreshChat() {
+        function refreshChat() {
         if (!activeChat) return;
         const container = document.getElementById('messagesArea');
         container.innerHTML = '';
@@ -644,6 +657,36 @@
             div.className = `message ${isFromMe ? 'sent' : 'received'}`;
             const time = new Date(msg.timestamp).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
             
+            // FIXED: Get the actual message text
+            let messageText = '';
+            
+            // Check different possible field names
+            if (msg.message) {
+                messageText = msg.message;
+            } else if (msg.encrypted_message) {
+                messageText = msg.encrypted_message;
+            } else if (msg.text) {
+                messageText = msg.text;
+            } else {
+                messageText = 'Message';
+            }
+            
+            // For debugging - log to console
+            console.log('Displaying message:', messageText);
+            
+            // Handle image messages
+            if (msg.is_file && messageText && (messageText.match(/\.(jpg|jpeg|png|gif|webp)$/i) || messageText.includes('/uploads/'))) {
+                messageText = `<img src="${messageText}" class="file-preview" onclick="window.open('${messageText}')" style="max-width:150px; max-height:120px; border-radius:8px; cursor:pointer;"><br><small>📷 Image</small>`;
+            }
+            // Handle voice messages
+            else if (msg.is_file && msg.file_name === 'voice-message.webm') {
+                messageText = `<audio controls src="${messageText}" style="max-width:180px; height:35px;"></audio><br><small>🎤 Voice message</small>`;
+            }
+            // Handle file downloads
+            else if (msg.is_file && messageText) {
+                messageText = `<a href="${messageText}" download style="color:${isFromMe ? '#0a0d14' : 'white'};">📎 ${msg.file_name || 'Download'}</a>`;
+            }
+            
             // Build reactions HTML
             let reactionsHtml = '';
             if (msg.reactions && msg.reactions.length > 0) {
@@ -651,21 +694,22 @@
                 msg.reactions.forEach(r => {
                     reactionCounts[r.reaction] = (reactionCounts[r.reaction] || 0) + 1;
                 });
-                reactionsHtml = '<div class="reactions">';
+                reactionsHtml = '<div class="reactions" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">';
                 for (const [emoji, count] of Object.entries(reactionCounts)) {
-                    reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${emoji}')">${emoji} ${count}</span>`;
+                    reactionsHtml += `<span class="reaction-badge" onclick="addReaction(${msg.id}, '${emoji}')" style="background:rgba(255,255,255,0.15); padding:2px 8px; border-radius:16px; font-size:12px; cursor:pointer;">${emoji} ${count}</span>`;
                 }
                 reactionsHtml += '</div>';
             }
             
+            // Build the message HTML with visible text content
             div.innerHTML = `
-                ${escapeHtml(msg.message)}
+                <div style="word-wrap: break-word; white-space: pre-wrap;">${messageText}</div>
                 ${msg.edited ? '<span style="font-size:9px;"> (edited)</span>' : ''}
                 <div class="message-time">${time} 🔒 AES-256</div>
                 ${reactionsHtml}
                 <div class="message-actions">
-                    <span onclick="replyTo('${escapeHtml(msg.message)}')">↩️ Reply</span>
-                    ${isFromMe ? `<span onclick="editMsg(${msg.id}, '${escapeHtml(msg.message)}')">✏️ Edit</span>` : ''}
+                    <span onclick="replyTo('${escapeHtml(messageText.toString().substring(0, 50))}')">↩️ Reply</span>
+                    ${isFromMe ? `<span onclick="editMsg(${msg.id}, '${escapeHtml(messageText.toString())}')">✏️ Edit</span>` : ''}
                     ${isFromMe ? `<span onclick="deleteMsg(${msg.id})">🗑️ Delete</span>` : ''}
                     <span onclick="showReactionPicker(${msg.id})">😊 React</span>
                 </div>
@@ -771,20 +815,37 @@
         loadDiscoverUsers();
     }
 
-    async function sendMessage() {
+       async function sendMessage() {
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
         if (!text || !activeChat) return;
         
-        const res = await fetch('/api/send-message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ from: currentUser.id, to: activeChat.id, message: text })
-        });
-        if (res.ok) {
-            input.value = '';
-            await loadMessages();
-            showNotify('Message sent ✓');
+        console.log('📤 Sending message:', text);
+        
+        try {
+            const res = await fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    from: currentUser.id, 
+                    to: activeChat.id, 
+                    message: text,
+                    isFile: false
+                })
+            });
+            const data = await res.json();
+            console.log('Send response:', data);
+            
+            if (res.ok && data.success) {
+                input.value = '';
+                await loadMessages();
+                showNotify('Message sent ✓');
+            } else {
+                showNotify('Failed to send message');
+            }
+        } catch(err) {
+            console.error('Send error:', err);
+            showNotify('Error sending message');
         }
     }
 
