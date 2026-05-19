@@ -15,14 +15,13 @@
             overflow: hidden;
         }
         
-        /* Main Layout - Mobile First */
         .app-container {
             display: flex;
             height: 100vh;
             position: relative;
         }
         
-        /* Sidebar - Hidden by default on mobile */
+        /* Sidebar */
         .sidebar {
             width: 85%;
             max-width: 320px;
@@ -42,7 +41,6 @@
             left: 0;
         }
         
-        /* Overlay when sidebar is open */
         .overlay {
             position: fixed;
             top: 0;
@@ -70,7 +68,17 @@
             color: #00e5b0;
         }
         
-        /* User Profile in Sidebar */
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #8696a0;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
         .user-profile {
             padding: 15px 20px;
             display: flex;
@@ -105,7 +113,6 @@
             color: #8696a0;
         }
         
-        /* Tabs */
         .tabs {
             display: flex;
             border-bottom: 1px solid #2a3458;
@@ -130,11 +137,9 @@
             border-bottom: 2px solid #00e5b0;
         }
         
-        /* Lists */
         .contacts-list, .requests-list, .discover-list {
             flex: 1;
             overflow-y: auto;
-            padding: 0;
         }
         
         .contact-item, .request-item, .discover-item {
@@ -146,7 +151,7 @@
             border-bottom: 1px solid #2a3458;
         }
         
-        .contact-item:active, .request-item:active, .discover-item:active {
+        .contact-item:active {
             background: rgba(255,255,255,0.05);
         }
         
@@ -175,13 +180,12 @@
             color: #8696a0;
         }
         
-        /* Request Buttons */
         .request-actions {
             display: flex;
             gap: 8px;
         }
         
-        .accept-btn, .reject-btn {
+        .accept-btn, .reject-btn, .add-btn {
             padding: 6px 12px;
             border-radius: 8px;
             border: none;
@@ -191,17 +195,9 @@
         
         .accept-btn { background: #00e5b0; color: #0a0d14; }
         .reject-btn { background: #ff4d6d; color: white; }
+        .add-btn { background: #00e5b0; color: #0a0d14; }
         
-        .add-btn {
-            background: #00e5b0;
-            color: #0a0d14;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        /* Chat Area - Takes full width on mobile */
+        /* Chat Area */
         .chat-area {
             flex: 1;
             display: flex;
@@ -210,7 +206,6 @@
             width: 100%;
         }
         
-        /* Chat Header */
         .chat-header {
             padding: 12px 16px;
             background: #111520;
@@ -269,7 +264,6 @@
             padding: 8px;
         }
         
-        /* 3-Dot Menu */
         .three-dot-menu {
             position: absolute;
             top: 45px;
@@ -303,7 +297,6 @@
             background: #2a3458;
         }
         
-        /* Messages Area */
         .messages-area {
             flex: 1;
             overflow-y: auto;
@@ -348,14 +341,12 @@
             margin-top: 5px;
             font-size: 11px;
             opacity: 0.6;
-            flex-wrap: wrap;
         }
         
         .message-actions span {
             cursor: pointer;
         }
         
-        /* Input Area - Always visible when chat is open */
         .input-area {
             padding: 12px 16px;
             background: #111520;
@@ -387,12 +378,8 @@
             border: none;
             font-size: 18px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
-        /* Settings Modal */
         .settings-modal {
             display: none;
             position: fixed;
@@ -442,7 +429,6 @@
         .delete-btn { background: #ff4d6d; color: white; }
         .logout-btn { background: #2a3458; color: white; }
         
-        /* Notification */
         .notification {
             position: fixed;
             bottom: 80px;
@@ -473,18 +459,10 @@
                 width: 320px;
                 box-shadow: none;
             }
-            
-            .overlay {
-                display: none;
-            }
-            
-            .menu-btn {
-                display: none;
-            }
-            
-            .message {
-                max-width: 65%;
-            }
+            .overlay { display: none; }
+            .menu-btn { display: none; }
+            .close-sidebar { display: none; }
+            .message { max-width: 65%; }
         }
         
         .reaction-picker {
@@ -519,30 +497,11 @@
             max-width: 180px;
             border-radius: 10px;
         }
-        
-        .close-sidebar {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: #8696a0;
-            font-size: 24px;
-            cursor: pointer;
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .close-sidebar {
-                display: block;
-            }
-        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Overlay -->
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
     
     <!-- Sidebar -->
@@ -556,7 +515,7 @@
             <div class="user-avatar" id="userAvatar">👤</div>
             <div class="user-details">
                 <div class="user-name" id="userName">User</div>
-                <div class="user-privacy" id="userPrivacy">🔒 Private</div>
+                <div class="user-privacy" id="userPrivacy">🌐 Public</div>
             </div>
         </div>
         
@@ -637,7 +596,6 @@
     let audioChunks = [];
     let isRecording = false;
 
-    // Load user from storage
     const savedUser = localStorage.getItem('user');
     if (!savedUser) {
         window.location.href = '/';
@@ -649,8 +607,10 @@
     async function loadApp() {
         document.getElementById('userName').innerText = currentUser.name;
         document.getElementById('userAvatar').innerHTML = currentUser.avatar || currentUser.name.charAt(0);
-        document.getElementById('privateToggle').checked = currentUser.is_private === 1;
-        document.getElementById('userPrivacy').innerHTML = currentUser.is_private ? '🔒 Private' : '🌐 Public';
+        
+        const isPrivate = currentUser.is_private === true || currentUser.is_private === 1;
+        document.getElementById('privateToggle').checked = isPrivate;
+        document.getElementById('userPrivacy').innerHTML = isPrivate ? '🔒 Private' : '🌐 Public';
         
         await loadContacts();
         await loadPendingRequests();
@@ -678,7 +638,7 @@
             
             contacts.forEach(contact => {
                 const div = document.createElement('div');
-                div.className = `contact-item ${activeChat && activeChat.id === contact.id ? 'active' : ''}`;
+                div.className = 'contact-item';
                 div.innerHTML = `
                     <div class="contact-avatar">${contact.avatar || contact.name.charAt(0)}</div>
                     <div class="contact-info">
@@ -778,17 +738,7 @@
         document.getElementById('inputArea').style.display = 'flex';
         document.getElementById('chatAvatar').innerHTML = user.avatar || user.name.charAt(0);
         await loadMessages();
-        
-        // Close sidebar on mobile
         closeSidebar();
-        
-        // Update active state
-        document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.contact-item').forEach(el => {
-            if (el.innerText.includes(user.name)) {
-                el.classList.add('active');
-            }
-        });
     }
 
     async function loadMessages() {
@@ -908,19 +858,27 @@
     }
 
     async function updatePrivacy() {
-        const isPrivate = document.getElementById('privateToggle').checked ? 1 : 0;
-        const res = await fetch('/api/update-privacy', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: currentUser.id, isPrivate })
-        });
-        if (res.ok) {
-            currentUser.is_private = isPrivate;
-            document.getElementById('userPrivacy').innerHTML = isPrivate ? '🔒 Private' : '🌐 Public';
-            showNotify(isPrivate ? 'Account is now private' : 'Account is now public');
-        } else {
+        const isPrivate = document.getElementById('privateToggle').checked;
+        
+        try {
+            const res = await fetch('/api/update-privacy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id, isPrivate: isPrivate })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                currentUser.is_private = isPrivate;
+                document.getElementById('userPrivacy').innerHTML = isPrivate ? '🔒 Private' : '🌐 Public';
+                showNotify(isPrivate ? 'Account is now private' : 'Account is now public');
+            } else {
+                document.getElementById('privateToggle').checked = !isPrivate;
+                showNotify('Failed to update privacy');
+            }
+        } catch(err) {
             document.getElementById('privateToggle').checked = !isPrivate;
-            showNotify('Failed to update');
+            showNotify('Error updating privacy');
         }
     }
 
@@ -1066,7 +1024,6 @@
     function showThreeDotMenu() {
         const menu = document.getElementById('threeDotMenu');
         menu.classList.toggle('show');
-        // Close after 3 seconds
         setTimeout(() => menu.classList.remove('show'), 3000);
     }
     
@@ -1092,7 +1049,6 @@
             loadContacts();
             loadDiscoverUsers();
             loadBlockedUsers();
-            // Clear current chat
             activeChat = null;
             document.getElementById('chatTitle').innerHTML = 'Select a chat';
             document.getElementById('inputArea').style.display = 'none';
@@ -1146,13 +1102,9 @@
         window.location.href = '/';
     }
     
-    // Close three dot menu when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.chat-actions')) {
             document.getElementById('threeDotMenu').classList.remove('show');
-        }
-        if (!e.target.closest('.sidebar') && !e.target.closest('.menu-btn')) {
-            // Don't auto close - only manual close
         }
     });
 </script>

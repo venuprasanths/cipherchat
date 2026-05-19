@@ -50,7 +50,7 @@ async function initDatabase() {
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             avatar TEXT DEFAULT '👤',
-            is_private BOOLEAN DEFAULT TRUE,
+            is_private BOOLEAN DEFAULT FALSE,
             last_seen TIMESTAMPTZ,
             created_at TIMESTAMPTZ DEFAULT NOW()
         );
@@ -112,6 +112,7 @@ app.use('/uploads', express.static(uploadDir));
 
 // ============ USER APIs ============
 
+// Login
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -121,6 +122,8 @@ app.post('/api/login', async (req, res) => {
         );
         const user = result.rows[0];
         if (user) {
+            // Ensure is_private is boolean
+            user.is_private = user.is_private === true || user.is_private === 1;
             await pool.query('UPDATE users SET last_seen = NOW() WHERE id = $1', [user.id]);
             res.json({ success: true, user });
         } else {
@@ -131,15 +134,16 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Signup - PUBLIC by default (is_private = false)
 app.post('/api/signup', async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password } = req.body;
     if (!name || !email || !password || password.length < 6) {
         return res.status(400).json({ error: 'Invalid input' });
     }
     try {
         const result = await pool.query(
-            'INSERT INTO users (name, email, password, is_private) VALUES ($1, $2, $3, $4) RETURNING id, name, email',
-            [name, email, password, true]
+            'INSERT INTO users (name, email, password, is_private) VALUES ($1, $2, $3, $4) RETURNING id, name, email, is_private',
+            [name, email, password, false]
         );
         res.json({ success: true, user: result.rows[0] });
     } catch (err) {
@@ -151,10 +155,18 @@ app.post('/api/signup', async (req, res) => {
     }
 });
 
+// Update privacy setting
 app.post('/api/update-privacy', async (req, res) => {
     const { userId, isPrivate } = req.body;
-    await pool.query('UPDATE users SET is_private = $1 WHERE id = $2', [isPrivate, userId]);
-    res.json({ success: true });
+    try {
+        const privateValue = isPrivate === true || isPrivate === 1 || isPrivate === 'true';
+        await pool.query('UPDATE users SET is_private = $1 WHERE id = $2', [privateValue, userId]);
+        console.log(`User ${userId} privacy updated to: ${privateValue ? 'Private' : 'Public'}`);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Privacy update error:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/users/:userId', async (req, res) => {
@@ -266,7 +278,6 @@ app.get('/api/all-messages/:userId/:contactId', async (req, res) => {
         ORDER BY timestamp ASC
     `, [userId, contactId]);
     
-    // DECRYPT each message before sending
     const decryptedMessages = result.rows.map(msg => ({
         id: msg.id,
         from_user: msg.from_user,
@@ -284,9 +295,8 @@ app.get('/api/all-messages/:userId/:contactId', async (req, res) => {
 app.post('/api/send-message', async (req, res) => {
     const { from, to, message, isFile, fileName } = req.body;
     
-    // ENCRYPT before storing
     const encryptedMsg = encryptMessage(message);
-    console.log(`🔐 Message encrypted: "${message.substring(0, 20)}" → "${encryptedMsg.substring(0, 30)}..."`);
+    console.log(`🔐 Message encrypted`);
     
     const result = await pool.query(`
         INSERT INTO messages (from_user, to_user, encrypted_message, is_file, file_name)
@@ -318,7 +328,6 @@ app.post('/api/edit-message', async (req, res) => {
 
 app.post('/api/add-reaction', async (req, res) => {
     const { messageId, userId, reaction } = req.body;
-    // Simplified - in production use a reactions table
     res.json({ success: true });
 });
 
@@ -356,5 +365,5 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🚀 CipherChat Server Running`);
     console.log(`📍 http://localhost:${PORT}`);
     console.log(`🔐 AES-256 Encryption ACTIVE`);
-    console.log(`✅ Ready for mobile devices\n`);
+    console.log(`✅ Default accounts are PUBLIC\n`);
 });
