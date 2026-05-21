@@ -517,7 +517,7 @@
             </div>
         </div>
         
-        <div class="input-area" id="inputArea">
+        <div class="input-area" id="inputArea" style="display: none;">
             <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
             <input type="file" id="fileInput" style="display: none" onchange="sendImage()">
             <button onclick="sendMessage()">➤</button>
@@ -689,19 +689,46 @@
         } catch(e) { console.log(e); }
     }
 
+    // ============ FIXED openChat FUNCTION ============
     async function openChat(user) {
+        console.log('openChat called for user:', user);
+        
+        if (!user || !user.id) {
+            console.error('Invalid user object');
+            return;
+        }
+        
         activeChat = user;
-        document.getElementById('chatTitle').innerHTML = user.name;
-        const inputArea = document.getElementById('inputArea');
-        inputArea.style.display = 'flex';
-        inputArea.style.visibility = 'visible';
-        document.getElementById('chatAvatar').innerHTML = user.avatar || user.name.charAt(0);
+        
+        // Update header
+        const titleElem = document.getElementById('chatTitle');
+        const avatarElem = document.getElementById('chatAvatar');
+        const inputAreaElem = document.getElementById('inputArea');
+        
+        if (titleElem) titleElem.innerHTML = user.name;
+        if (avatarElem) avatarElem.innerHTML = user.avatar || user.name.charAt(0);
+        
+        // CRITICAL FIX: Show the input area
+        if (inputAreaElem) {
+            console.log('Making input area visible');
+            inputAreaElem.style.display = 'flex';
+            inputAreaElem.style.visibility = 'visible';
+        } else {
+            console.error('inputArea element not found!');
+            return;
+        }
+        
+        // Load messages
         await loadMessages();
         closeSidebar();
         
+        // Focus on input after chat opens
         setTimeout(() => {
-            const input = document.getElementById('messageInput');
-            if (input) input.focus();
+            const inputElem = document.getElementById('messageInput');
+            if (inputElem) {
+                console.log('Focusing on message input');
+                inputElem.focus();
+            }
         }, 200);
     }
 
